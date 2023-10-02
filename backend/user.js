@@ -1,5 +1,4 @@
 const mysql = require('mysql');
-const util = require('util');
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -11,9 +10,7 @@ const connection = mysql.createConnection({
 
 module.exports = {
     getUserByUserName:  (username) => {
-
         return new Promise((resolve, reject) => {
-
             connection.query('SELECT * FROM Felhasznalo WHERE felhasznalonev=?', [username], function (err, rows) {
                 if (!rows) {
                     reject(new Error('Error: rows is undefined'));
@@ -22,12 +19,9 @@ module.exports = {
                 }
             });  
     
-        });
-        
-        
+        });   
     },
     registerUser: (user, callback) => {
-
         let payload = {
             felhasznalonev: user.felhasznalonev,
             vezeteknev: user.vezeteknev,
@@ -41,7 +35,6 @@ module.exports = {
             if (err) throw err;
             return callback(err, rows);
         });
-
     },
     updateUserDetails: (user, callback) => {
 
@@ -60,14 +53,10 @@ module.exports = {
         });
     },
     deleteUser: (user, callback) => {
-        
-
         connection.query('DELETE FROM Felhasznalo WHERE felhasznalonev=?', [user.felhasznalonev], (err, rows, fields) => {
             if (err) throw err;
             return callback(err, rows);
         });
-
-        
     } 
 
 };
