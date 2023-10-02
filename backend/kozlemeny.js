@@ -14,6 +14,12 @@ module.exports = {
             return callback(err, rows);
         });
     },
+    getKozlemenyById: (id, callback) => {
+        connection.query('SELECT * FROM Kozlemeny WHERE id=?', [id], (err, rows) => {
+            if (err) throw err;
+            return callback(err, rows);
+        });
+    },
     getKozlemenyByFolyoirat: (folyoirat_azon, callback) => {
         connection.query('SELECT * FROM Kozlemeny WHERE folyoirat_azon=?', [folyoirat_azon], (err, rows) => {
             if (err) throw err;

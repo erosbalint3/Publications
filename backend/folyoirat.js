@@ -14,6 +14,12 @@ module.exports = {
             return callback(err, rows);
         });
     },
+    getFolyoiratById: (id, callback) => {
+        connection.query('SELECT * FROM Folyoirat WHERE id=?', [id], (err, rows) => {
+            if (err) throw err;
+            return callback(err, rows);
+        });
+    },
     getFolyoiratokByKiado: (kiado_nev, callback) => {
         connection.query('SELECT * FROM Folyoirat WHERE Folyoirat.kiado =?', [kiado_nev], (err, rows) => {
             if (err) throw err;
@@ -26,26 +32,26 @@ module.exports = {
             return callback(err, rows);
         });
     },
-    getFolyoiratBySzerkeszto: (szerkesztoAdmin, callback) => {
-        connection.query('SELECT * FROM Kozlemeny, Szerzo, szerzoi WHERE Kozlemeny.id = szerzoi.kozl_id AND szerzoi.szerzo_id = Szerzo.id AND Szerzo.nev =?', [nev], (err, rows) => {
+    getFolyoiratokBySzerkeszto: (szerkesztoAdmin, callback) => {
+        connection.query('SELECT * FROM Folyoirat WHERE szerkeszto = (SELECT felhasznalonev FROM Felhasznalo WHERE felhasznaloNev=? AND jogosultsag="ADMIN")', [szerkesztoAdmin], (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });
     },
-    updateKozlemeny: (kozlemeny, callback) => {
-        connection.query('UPDATE Kozlemeny SET ? WHERE id=?', [kozlemeny, kozlemeny.id], (err, rows) => {
+    updateFolyoirat: (folyoirat, callback) => {
+        connection.query('UPDATE Folyoirat SET ? WHERE id=?', [folyoirat, folyoirat.id], (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });
     },
-    deleteKozlemeny: (kozlemeny, callback) => {
-        connection.query('DELETE FROM Kozlemeny WHERE id=?', [kozlemeny.id], (err, rows) => {
+    deleteFolyoirat: (folyoirat, callback) => {
+        connection.query('DELETE FROM Folyoirat WHERE id=?', [folyoirat.id], (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });
     },
-    addKozlemeny: (kozlemeny, callback) => {
-        connection.query('INSERT INTO Kozlemeny SET ?', [kozlemeny], (err, rows) => {
+    addFolyoirat: (folyoirat, callback) => {
+        connection.query('INSERT INTO Folyoirat SET ?', [folyoirat], (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });
