@@ -1,0 +1,48 @@
+h1 {
+    text-align: center;
+    margin-top: 50px;
+    color: #333;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    justify-self: center;
+    margin: 0 auto;
+    width: 15%;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #333;
+    color: white;
+}
+
+form input {
+    width: 90%;
+    height: 30px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+form input:focus {
+    outline: none;
+    border: 1px solid #333;
+}
+
+form input::placeholder {
+    color: #ccc;
+}
+
+form button {
+    width: 50%;
+    height: 50px;
+    margin-top: 10px;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    border: none;
+    cursor: pointer;
+}

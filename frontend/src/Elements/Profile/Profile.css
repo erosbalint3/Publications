@@ -1,0 +1,82 @@
+#profileText {
+    width: 30%;
+}
+
+#profilePicture img {
+    width: 150px;
+    height: 150px;
+}
+
+#profileText div {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 3px;
+}
+
+#profileText div p {
+    margin: 5px;
+    padding: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+#profileText div input {
+    width: 100%;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+#profileText div input:focus {
+    outline: none;
+    border: 1px solid #333;
+}
+
+#profileText div input::placeholder {
+    color: #ccc;
+}
+
+#mainChangePasswordPart {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+#changePasswordPopup {
+    display: none;
+    position: relative;
+    z-index: 1;
+    width: auto;
+    height: 100%;
+    overflow: auto;
+    padding: 10px;
+    background-color: #a3a3a381;
+    border-radius: 10px;
+}
+
+#changePasswordPopupBody div {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 3px;
+}
+
+#changePasswordPopupBody div p {
+    margin: 5px;
+    padding: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+#changePasswordPopupBody div input {
+    width: 100%;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+

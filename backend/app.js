@@ -8,10 +8,10 @@ const folyoirat = require('./folyoirat.js');
 const szerzo = require('./szerzo.js');
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 app.use(cors({
-    origin: 'localhost:3306'
+    origin: 'http://localhost:3000'
 }));
 
 app.get('/user/', async (req, res) => {
@@ -21,16 +21,19 @@ app.get('/user/', async (req, res) => {
         });
 });
 app.post('/user/', (req, res) => {
+    req.query.user = JSON.parse(req.query.user);
     user.registerUser(req.query.user, (err, rows) => {
         res.send(rows);
     });
 });
 app.put('/user/', (req, res) => {
+    req.query.user = JSON.parse(req.query.user);
     user.updateUserDetails(req.query.user, (err, rows) => {
         res.send(rows);
     });
 });
 app.delete('/user/', (req, res) => {
+    req.query.user = JSON.parse(req.query.user);
     user.deleteUser(req.query.user, (err, rows) => {
         res.send(rows);
     });
