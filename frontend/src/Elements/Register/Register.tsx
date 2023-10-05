@@ -5,20 +5,13 @@ const Register = () => {
 
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [vezeteknev, setVezeteknev] = useState<string>('');
+    const [keresztnev, setKeresztnev] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
 
-    const register = async () => {
-        const response = await fetch('http://localhost:4000/register', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include',
-            body: JSON.stringify({
-                username,
-                password
-            })
-        });
-        const content = await response.json();
-        console.log(content);
-    }
+    const register = () => {
+
+    };
 
     return (
         <div id="registerMain">
