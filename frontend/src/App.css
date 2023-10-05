@@ -23,6 +23,22 @@
     margin-top: 15%;
 }
 
+#kozlemenyekMain {
+    margin-top: 1%;
+}
+
+#szerzokMain {
+    margin-top: 1%;
+}
+
+#kiadokMain {
+    margin-top: 1%;
+}
+
+#folyoiratokMain {
+    margin-top: 1%;
+}
+
 #navBar a {
     float: left;
     color: #f2f2f2;

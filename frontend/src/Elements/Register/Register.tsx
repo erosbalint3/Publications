@@ -20,11 +20,11 @@ const Register = () => {
                 <label htmlFor="Username">Felhasznalonév</label>
                 <input id='username' value={username} onChange={e => setUsername(e.target.value)} />
                 <label htmlFor='vezeteknev'>Vezetéknév</label>
-                <input id='vezeteknev' value={username} onChange={e => setUsername(e.target.value)} />
+                <input id='vezeteknev' value={vezeteknev} onChange={e => setUsername(e.target.value)} />
                 <label htmlFor='keresztnev'>Keresztnév</label>
-                <input id='keresztnev' value={username} onChange={e => setUsername(e.target.value)} />
+                <input id='keresztnev' value={keresztnev} onChange={e => setUsername(e.target.value)} />
                 <label htmlFor='email'>Email</label>
-                <input id='email' value={username} onChange={e => setUsername(e.target.value)} />
+                <input id='email' value={email} onChange={e => setUsername(e.target.value)} />
                 <label htmlFor="Password">Jelszó</label>
                 <input id='password' value={password} onChange={e => setPassword(e.target.value)} />
                 <button onClick={register}>Register</button>
