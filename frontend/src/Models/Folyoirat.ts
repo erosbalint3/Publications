@@ -4,5 +4,5 @@ export interface Folyoirat {
     szerkeszto: string;
     nyelv: string;  
     minosites: string;
-    kiado_azon: string;
+    kiado: string;
 };

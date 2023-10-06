@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DataGrid } from '@mui/x-data-grid';
 import { GridRowsProp } from '@mui/x-data-grid';
 import { GridColDef } from '@mui/x-data-grid';
 import { Kiado } from '../../Models/Kiado';
 import { v4 as uuidv4 } from 'uuid';
+import KiadoService from '../../Services/kiadoService';
 import './Kiadok.css';
+
+const kiadoService = new KiadoService();
 
 const displayAddNewKiadoPopUp = () => {
     const kiadoPopUp = document.getElementById('addNewKiadoPopUp');
@@ -15,12 +18,19 @@ const displayAddNewKiadoPopUp = () => {
     }
 }
 
-const testKiadok: GridRowsProp = [
-    {nev: "Teszt1", telszam: 'Teszt1', szekhely: 'Teszt1'},
-    {nev: "Teszt2", telszam: 'Teszt2', szekhely: 'Teszt2'},
-    {nev: "Teszt3", telszam: 'Teszt3', szekhely: 'Teszt3'},
-    {nev: "Teszt4", telszam: 'Teszt4', szekhely: 'Teszt4'},
-];
+const deleteKiado = (row: Kiado) => {
+    kiadoService.deleteKiado(row);
+}
+
+const addNewKiado = () => {
+    const nev = document.getElementById('addNewKiadoPopUpContent')?.getElementsByTagName('input')[0].value;
+    const telszam = document.getElementById('addNewKiadoPopUpContent')?.getElementsByTagName('input')[1].value;
+    const szekhely = document.getElementById('addNewKiadoPopUpContent')?.getElementsByTagName('input')[2].value;
+    const newKiado: Kiado = {nev: nev!, telefonszam: telszam!, szekhely: szekhely!};
+    kiadoService.addNewKiado(newKiado);
+    const kiadoPopUp = document.getElementById('addNewKiadoPopUp');
+    kiadoPopUp!.style.display = 'none'; 
+}
 
 const columns: GridColDef[] = [
     {
@@ -31,24 +41,32 @@ const columns: GridColDef[] = [
         renderCell: (params) => {
             return (
                 <div>
-                    <button>Delete</button>
+                    <button onClick={deleteKiado(params.row)!}>Delete</button>
                 </div>
             )
         }
     },
     {field: 'nev', headerName: 'Név', width: 200},
-    {field: 'telszam', headerName: 'Telefonszám', width: 200, editable: true},
+    {field: 'telefonszam', headerName: 'Telefonszám', width: 200, editable: true},
     {field: 'szekhely', headerName: 'Székhely', width: 200, editable: true},
 ];
 
 const Kiadok = () => {
+    const [kiadok, setKiadok] = useState<Kiado[]>([]);
+
+    useEffect(() => {
+        kiadoService.getAllKiado().then((response) => {
+            setKiadok(response);
+        });
+    }, []);
+
     return (
         <div id='kiadokMain'>
             <div id='ButtonsGroup'>
                 <button onClick={displayAddNewKiadoPopUp}>Add new</button>
             </div>
             <div>
-                <DataGrid rows={testKiadok} columns={columns} editMode='row' getRowId={(row) => row.nev}/>
+                <DataGrid rows={kiadok} columns={columns} editMode='row' getRowId={(row) => row.nev}/>
             </div>
             <div id='addNewKiadoPopUp'>
                 <div id='addNewKiadoPopUpContent'>
@@ -66,7 +84,7 @@ const Kiadok = () => {
                     </div>
                     <div>
                         <button onClick={displayAddNewKiadoPopUp}>Cancel</button>
-                        <button>Add new</button>
+                        <button onClick={addNewKiado}>Add new</button>
                     </div>
                 </div>
             </div>

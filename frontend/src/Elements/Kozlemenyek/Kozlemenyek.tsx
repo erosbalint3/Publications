@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { GridRowsProp } from '@mui/x-data-grid';
 import { GridColDef } from '@mui/x-data-grid';
 import { Kozlemeny } from '../../Models/Kozlemeny';
 import { v4 as uuidv4 } from 'uuid';
+import KozlemenyService from '../../Services/kozlemenyService';
 import './Kozlemenyek.css';
+
+const kozlemenyService = new KozlemenyService();
+
+
 
 const displayAddNewKozlemenyPopUp = () => {
     const kozlemenyPopUp = document.getElementById('addNewKozlemenyPopUp');
@@ -16,10 +21,10 @@ const displayAddNewKozlemenyPopUp = () => {
 }
 
 const testKozlemenyek: GridRowsProp = [
-    {id: uuidv4(), cim: "Teszt1", folyoirat_azon: uuidv4(), kiadas_eve: 2023},
-    {id: uuidv4(), cim: "Teszt2", folyoirat_azon: uuidv4(), kiadas_eve: 2024},
-    {id: uuidv4(), cim: "Teszt3", folyoirat_azon: uuidv4(), kiadas_eve: 2025},
-    {id: uuidv4(), cim: "Teszt4", folyoirat_azon: uuidv4(), kiadas_eve: 2026},
+    {id: uuidv4(), cim: "Teszt1", folyoirat_azon: uuidv4(), kiadas_eve: 2023, felhasznalonev: 'Teszt1'},
+    {id: uuidv4(), cim: "Teszt2", folyoirat_azon: uuidv4(), kiadas_eve: 2024, felhasznalonev: 'Teszt2'},
+    {id: uuidv4(), cim: "Teszt3", folyoirat_azon: uuidv4(), kiadas_eve: 2025, felhasznalonev: 'Teszt3'},
+    {id: uuidv4(), cim: "Teszt4", folyoirat_azon: uuidv4(), kiadas_eve: 2026, felhasznalonev: 'Teszt4'},
 ];
 
 const columns: GridColDef[] = [
@@ -31,7 +36,7 @@ const columns: GridColDef[] = [
         renderCell: (params) => {
             return (
                 <div>
-                    <button>Delete</button>
+                    <button onClick={deleteKozlemeny(params.row)!}>Delete</button>
                 </div>
             )
         }
@@ -42,14 +47,37 @@ const columns: GridColDef[] = [
     {field: 'kiadas_eve', headerName: 'Kiadás éve', width: 200, editable: true},
 ];
 
+const addNewKozlemeny = () => {
+    const cim = document.getElementById('addNewKozlemenyPopUpContent')?.getElementsByTagName('input')[0].value;
+    const folyoirat_azon = document.getElementById('addNewKozlemenyPopUpContent')?.getElementsByTagName('input')[1].value;
+    const kiadas_eve = document.getElementById('addNewKozlemenyPopUpContent')?.getElementsByTagName('input')[2].value;
+    const felhasznalonev = document.getElementById('addNewKozlemenyPopUpContent')?.getElementsByTagName('input')[3].value;
+    const newKozlemeny: Kozlemeny = {id: uuidv4(), cim: cim!, folyoirat_azon: folyoirat_azon!, kiadas_eve: parseInt(kiadas_eve!), felhasznalonev: felhasznalonev!};
+    kozlemenyService.addNewKozlemeny(newKozlemeny);
+    const kozlemenyPopUp = document.getElementById('addNewKozlemenyPopUp');
+    kozlemenyPopUp!.style.display = 'none'; 
+};
+
+const deleteKozlemeny = (kozlemeny: Kozlemeny) => {
+    kozlemenyService.deleteKozlemeny(kozlemeny);
+};
+
 const Kozlemenyek = () => {
+    const [kozlemenyek, setKozlemenyek] = useState<Kozlemeny[]>([]);
+
+    useEffect(() => {
+        kozlemenyService.getAllKozlemeny().then((data) => {
+            setKozlemenyek(data);
+        });
+    }, []);
+
     return (
         <div id='kozlemenyekMain'>
             <div id='ButtonsGroup'>
                 <button onClick={displayAddNewKozlemenyPopUp}>Add new</button>
             </div>
             <div>
-                <DataGrid rows={testKozlemenyek} columns={columns} editMode='row'/>
+                <DataGrid rows={kozlemenyek} columns={columns} editMode='row'/>
             </div>
             <div id='addNewKozlemenyPopUp'>
                 <div id='addNewKozlemenyPopUpContent'>
@@ -66,8 +94,12 @@ const Kozlemenyek = () => {
                         <input type='text' />
                     </div>
                     <div>
+                        <label>Felhasználónév</label>
+                        <input type='text' />
+                    </div>
+                    <div>
                         <button onClick={displayAddNewKozlemenyPopUp}>Cancel</button>
-                        <button>Add new</button>
+                        <button onClick={addNewKozlemeny}>Add new </button>
                     </div>
                 </div>
             </div>

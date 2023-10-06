@@ -21,19 +21,21 @@ class UserService {
         return await response.json();
     }
 
-    async deleteUser(userName: string) {
-        const response = await fetch('/user/', {
+    async deleteUser(user: User) {
+        const headers = {'Content-Type': 'application/json', 'Allow-Origin-Access-Control': '*'};
+        const response = await fetch(`http://localhost:3001/user/?user=${encodeURIComponent(JSON.stringify(user))}`, {
             method: 'DELETE',
-            body: JSON.stringify({username: userName})
-        } as RequestInit);
+            headers: headers,
+        });
         return await response.json();
     }
 
-    async updateUser(userName: string, password: string) {
-        const response = await fetch('/user/', {
+    async saveUser(user: User) {
+        const headers = {'Content-Type': 'application/json', 'Allow-Origin-Access-Control': '*'};
+        const response = await fetch(`http://localhost:3001/user/?user=${encodeURIComponent(JSON.stringify(user))}`, {
             method: 'PUT',
-            body: JSON.stringify({username: userName, password: password})
-        } as RequestInit);
+            headers: headers,
+        });
         return await response.json();
     }
 }

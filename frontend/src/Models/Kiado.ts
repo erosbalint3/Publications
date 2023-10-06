@@ -1,5 +1,5 @@
 export interface Kiado {
     nev: string;
-    telszam: string;
+    telefonszam: string;
     szekhely: string;
 }

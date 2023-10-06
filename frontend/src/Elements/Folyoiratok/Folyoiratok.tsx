@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { DataGrid } from '@mui/x-data-grid';
 import { GridRowsProp } from '@mui/x-data-grid';
 import { GridColDef } from '@mui/x-data-grid';
 import { Folyoirat } from '../../Models/Folyoirat';
 import { v4 as uuidv4 } from 'uuid';
 import './Folyoiratok.css';
+import { useEffect } from "react";
+import FolyoiratService from "../../Services/folyoiratService";
+
+const folyoiratService = new FolyoiratService();
 
 const displayAddNewFolyoiratPopUp = () => {
     const folyoiratPopUp = document.getElementById('addNewFolyoiratPopUp');
@@ -15,13 +19,6 @@ const displayAddNewFolyoiratPopUp = () => {
     }
 }
 
-const testFolyoiratok: GridRowsProp = [
-    {id: uuidv4(), nev: "Teszt1", szerkeszto: 'Teszt1', nyelv: "Teszt1", minosites: "Teszt1", kiado: uuidv4()},
-    {id: uuidv4(), nev: "Teszt2", szerkeszto: 'Teszt2', nyelv: "Teszt2", minosites: "Teszt2", kiado: uuidv4()},
-    {id: uuidv4(), nev: "Teszt3", szerkeszto: 'Teszt3', nyelv: "Teszt3", minosites: "Teszt3", kiado: uuidv4()},
-    {id: uuidv4(), nev: "Teszt4", szerkeszto: 'Teszt4', nyelv: "Teszt4", minosites: "Teszt4", kiado: uuidv4()},
-];
-
 const columns: GridColDef[] = [
     {
         field: 'action', 
@@ -31,7 +28,7 @@ const columns: GridColDef[] = [
         renderCell: (params) => {
             return (
                 <div>
-                    <button>Delete</button>
+                    <button onClick={deleteFolyoirat(params.row)!}>Delete</button>
                 </div>
             )
         }
@@ -44,14 +41,37 @@ const columns: GridColDef[] = [
     {field: 'kiado', headerName: 'Kiadó', width: 200},
 ];
 
+const addNewFolyoirat = () => {
+    const nev = document.getElementById('addNewFolyoiratPopUpContent')?.getElementsByTagName('input')[0].value;
+    const szerkeszto = document.getElementById('addNewFolyoiratPopUpContent')?.getElementsByTagName('input')[1].value;
+    const nyelv = document.getElementById('addNewFolyoiratPopUpContent')?.getElementsByTagName('input')[2].value;
+    const minosites = document.getElementById('addNewFolyoiratPopUpContent')?.getElementsByTagName('input')[3].value;
+    const newFolyoirat: Folyoirat = {id: uuidv4(), nev: nev!, szerkeszto: szerkeszto!, nyelv: nyelv!, minosites: minosites!, kiado: uuidv4()};
+    folyoiratService.addNewFolyoirat(newFolyoirat);
+    const folyoiratPopUp = document.getElementById('addNewFolyoiratPopUp');
+    folyoiratPopUp!.style.display = 'none';
+};
+
+const deleteFolyoirat = (row: Folyoirat) => {
+    folyoiratService.deleteFolyoirat(row);
+};
+
 const Folyoiratok = () => {
+    const [folyoiratok, setFolyoiratok] = useState<Folyoirat[]>([]);
+
+    useEffect(() => {
+        folyoiratService.getAllFolyoirat().then((response) => {
+            setFolyoiratok(response);
+        });
+    }, []);
+
     return (
         <div id="folyoiratokMain">
             <div id='ButtonsGroup'>
                 <button onClick={displayAddNewFolyoiratPopUp}>Add new</button>
             </div>
             <div>
-                <DataGrid rows={testFolyoiratok} columns={columns} editMode='row'/>
+                <DataGrid rows={folyoiratok} columns={columns} editMode='row'/>
             </div>
             <div id='addNewFolyoiratPopUp'>
                 <div id='addNewFolyoiratPopUpContent'>
@@ -73,7 +93,7 @@ const Folyoiratok = () => {
                     </div>
                     <div>
                         <button onClick={displayAddNewFolyoiratPopUp}>Cancel</button>
-                        <button>Add new</button>
+                        <button onClick={addNewFolyoirat}>Add new</button>
                     </div>
                 </div>
             </div>

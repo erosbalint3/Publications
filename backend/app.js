@@ -65,6 +65,7 @@ app.get('/kozlemeny/felhasznalonev/', (req, res) => {
     });
 });
 app.post('/kozlemeny/', (req, res) => {
+    req.query.kozlemeny = JSON.parse(req.query.kozlemeny);
     kozlemeny.addKozlemeny(req.query.kozlemeny, (err, rows) => {
         res.send(rows);
     });
@@ -75,6 +76,7 @@ app.put('/kozlemeny/', (req, res) => {
     });
 });
 app.delete('/kozlemeny/', (req, res) => {
+    req.query.kozlemeny = JSON.parse(req.query.kozlemeny);
     kozlemeny.deleteKozlemeny(req.query.kozlemeny, (err, rows) => {
         res.send(rows);
     });
@@ -91,16 +93,19 @@ app.get('/kiado/', (req, res) => {
     });
 });
 app.post('/kiado/', (req, res) => {
+    req.query.kiado = JSON.parse(req.query.kiado);
     kiado.addKiado(req.query.kiado, (err, rows) => {    
         res.send(rows);
     });
 });
 app.put('/kiado/', (req, res) => {
+    req.query.kiado = JSON.parse(req.query.kiado);
     kiado.updateKiado(req.query.kiado, (err, rows) => {
         res.send(rows);
     });
 });
 app.delete('/kiado/', (req, res) => {
+    req.query.kiado = JSON.parse(req.query.kiado);
     kiado.deleteKiado(req.query.kiado, (err, rows) => {
         res.send(rows);
     });
@@ -132,16 +137,19 @@ app.get('/folyoirat/szerkeszto/', (req, res) => {
     });
 });
 app.post('/folyoirat/', (req, res) => {
+    req.query.folyoirat = JSON.parse(req.query.folyoirat);
     folyoirat.addFolyoirat(req.query.folyoirat, (err, rows) => {
         res.send(rows);
     });
 });
 app.put('/folyoirat/', (req, res) => {
+    req.query.folyoirat = JSON.parse(req.query.folyoirat);
     folyoirat.updateFolyoirat(req.query.folyoirat, (err, rows) => {
         res.send(rows);
     });
 });
 app.delete('/folyoirat/', (req, res) => {
+    req.query.folyoirat = JSON.parse(req.query.folyoirat);
     folyoirat.deleteFolyoirat(req.query.folyoirat, (err, rows) => {
         res.send(rows);
     });
@@ -158,16 +166,19 @@ app.get('/szerzo/kozlemeny/', (req, res) => {
     });
 });
 app.post('/szerzo/', (req, res) => {
+    req.query.szerzo = JSON.parse(req.query.szerzo);
     szerzo.addSzerzo(req.query.szerzo, (err, rows) => {
         res.send(rows);
     });
 });
 app.put('/szerzo/', (req, res) => {
+    req.query.szerzo = JSON.parse(req.query.szerzo);
     szerzo.updateSzerzo(req.query.szerzo, (err, rows) => {
         res.send(rows);
     });
 });
 app.delete('/szerzo/', (req, res) => {
+    req.query.szerzo = JSON.parse(req.query.szerzo);
     szerzo.deleteSzerzo(req.query.szerzo, (err, rows) => {
         res.send(rows);
     });
