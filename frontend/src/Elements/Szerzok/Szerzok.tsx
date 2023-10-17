@@ -32,7 +32,7 @@ const columns: GridColDef[] = [
             )
         }
     },
-    {field: 'id', headerName: 'ID', width: 200, editable: true}
+    {field: 'id', headerName: 'ID', width: 200, editable: true},
     {field: 'nev', headerName: 'Név', width: 200, editable: true},
     {field: 'nemzetiseg', headerName: 'Nemzetiség', width: 200, editable: true},
     {field: 'email', headerName: 'Email', width: 200, editable: true},
