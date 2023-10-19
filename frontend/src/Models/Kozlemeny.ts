@@ -4,4 +4,5 @@ export interface Kozlemeny {
     folyoirat_azon: string;
     kiadas_eve: number;
     felhasznalonev?: string;
+    szerzoi?: string[];
 }

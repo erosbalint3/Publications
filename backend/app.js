@@ -67,10 +67,11 @@ app.get('/kozlemeny/felhasznalonev/', (req, res) => {
 app.post('/kozlemeny/', (req, res) => {
     req.query.kozlemeny = JSON.parse(req.query.kozlemeny);
     kozlemeny.addKozlemeny(req.query.kozlemeny, (err, rows) => {
-        res.send(rows);
+        res.send(rows); 
     });
 });
 app.put('/kozlemeny/', (req, res) => {
+    req.query.kozlemeny = JSON.parse(req.query.kozlemeny);
     kozlemeny.updateKozlemeny(req.query.kozlemeny, (err, rows) => {
         res.send(rows);
     });

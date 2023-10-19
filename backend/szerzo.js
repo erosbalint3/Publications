@@ -1,3 +1,4 @@
+const { query } = require('express');
 const mysql = require('mysql');
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -15,7 +16,7 @@ module.exports = {
         });
     },
     getSzerzoByKozlemeny: (kozlemeny, callback) => {
-        connection.query('SELECT * FROM Szerzo, szerzoik, Kozlemeny WHERE szerzoik.szerzo_id = Szerzo.id AND szerzoik.kozl_id = Kozlemeny.id AND Kozlemeny.id=?', [kozlemeny.id], (err, rows) => {
+        connection.query('SELECT DISTINCT Szerzo.nev FROM Szerzo, szerzoi, Kozlemeny WHERE szerzoi.szerzo_id = Szerzo.nev AND szerzoi.kozl_id = Kozlemeny.id AND Kozlemeny.id=?', [kozlemeny], (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });

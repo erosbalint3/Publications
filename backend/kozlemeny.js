@@ -4,7 +4,8 @@ const connection = mysql.createConnection({
     user: 'root',
     password: '',
     database: 'publications',
-    port: '3306'
+    port: '3306',
+    debug: true
 });
 
 module.exports = {
@@ -39,7 +40,13 @@ module.exports = {
         });
     },
     updateKozlemeny: (kozlemeny, callback) => {
-        connection.query('UPDATE Kozlemeny SET ? WHERE id=?', [kozlemeny, kozlemeny.id], (err, rows) => {
+        kozlemeny.szerzoi.forEach(element => {
+            connection.query('UPDATE szerzoi SET szerzo_id=? WHERE kozl_id=?', [element, kozlemeny.id], (err, rows) => {
+                if (err) throw err;
+            }); 
+        });
+
+        connection.query('UPDATE Kozlemeny SET cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=? WHERE id=?', [kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev, kozlemeny.id], (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });
@@ -51,7 +58,14 @@ module.exports = {
         });
     },
     addKozlemeny: (kozlemeny, callback) => {
-        connection.query('INSERT INTO Kozlemeny SET ?', [kozlemeny], (err, rows) => {
+        console.log(kozlemeny);
+        kozlemeny.szerzoi.forEach(element => {
+            connection.query('INSERT INTO szerzoi SET szerzo_id=?, kozl_id=?', [element, kozlemeny.id], (err, rows) => {
+                if (err) throw err;
+            }); 
+        });
+
+        connection.query('INSERT INTO Kozlemeny SET id=?, cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=?', [kozlemeny.id, kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev], (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });
