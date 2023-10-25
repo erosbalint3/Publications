@@ -10,6 +10,7 @@ import SzerzoService from '../../Services/szerzoService';
 import { Szerzo } from '../../Models/Szerzo';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContentText from '@mui/material/DialogContentText';
+import { ReactSession } from 'react-client-session';
 
 const kozlemenyService = new KozlemenyService();
 const szerzoService = new SzerzoService();
@@ -26,6 +27,11 @@ const Kozlemenyek = () => {
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [selectedKozlemeny, setSelectedKozlemeny] = useState<Kozlemeny>();
     const [addData, setAddData] = useState<Kozlemeny>({id: '', cim: '', folyoirat_azon: '', kiadas_eve: 0, szerzoi: [], felhasznalonev: ''});
+
+    const user = ReactSession.get('user');
+    const isLoggedIn = ReactSession.get('isLoggedIn');
+
+    let startIndex = 0;
 
     const handleOpen = (params: any) => {
         setSelectedKozlemeny(params.row);
@@ -57,6 +63,11 @@ const Kozlemenyek = () => {
                 });
             });
         });
+        if (startIndex == 0 && (!isLoggedIn || user.jogosultsag != "ADMIN")) {
+            alert('You are not logged in!');
+            window.location.href = '/login';
+            startIndex++;
+        }
     }, []);
 
     const columns: GridColDef[] = [
@@ -94,7 +105,7 @@ const Kozlemenyek = () => {
                 <button onClick={() => setAddDialogOpen(true)}>Add new</button>
             </div>
             <div>
-                <DataGrid rows={kozlemenyek} columns={columns} editMode='row'/>
+                <DataGrid rows={kozlemenyek} columns={columns}/>
             </div>
             <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
                 <DialogTitle>Subscribe</DialogTitle>

@@ -3,6 +3,6 @@ export interface Folyoirat {
     nev: string;
     szerkeszto: string;
     nyelv: string;  
-    minosites: string;
+    minosites: number;
     kiado: string;
 };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import UserService from '../../Services/userService';
 import './Register.css';
 import { Jogosultsag } from '../../Enums/Jogosultsag';
+import { genSaltSync, hash, hashSync } from "bcrypt-ts";
 
 const Register = () => {
 
@@ -14,20 +15,22 @@ const Register = () => {
     const [email, setEmail] = useState<string>('');
 
     const register = () => {
+        const hashedPassword = hashSync(password, genSaltSync(10));
         userService.registerUser({
             felhasznalonev: username, 
             vezeteknev: vezeteknev,
             keresztnev: keresztnev,
             email: email,
-            jelszo: password,
-            jogosultsag:Jogosultsag.Felhasznalo
+            jelszo: hashedPassword,
+            jogosultsag:Jogosultsag.Kutato
         });
+        window.location.href = '/login';
     };
 
     return (
         <div id="registerMain">
             <h1>Register</h1>
-            <form>
+            <div id='formDiv'>
                 <label htmlFor="Username">Felhasznalonév</label>
                 <input id='username' value={username} onChange={e => setUsername(e.target.value)} />
                 <label htmlFor='vezeteknev'>Vezetéknév</label>
@@ -37,9 +40,9 @@ const Register = () => {
                 <label htmlFor='email'>Email</label>
                 <input id='email' value={email} onChange={e => setEmail(e.target.value)} />
                 <label htmlFor="Password">Jelszó</label>
-                <input id='password' value={password} onChange={e => setPassword(e.target.value)} />
+                <input type='password' id='password' value={password} onChange={e => setPassword(e.target.value)} />
                 <button onClick={register}>Register</button>
-            </form>
+            </div>
         </div>
     )
 };

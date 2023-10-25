@@ -22,6 +22,7 @@ app.get('/user/', async (req, res) => {
 });
 app.post('/user/', (req, res) => {
     req.query.user = JSON.parse(req.query.user);
+    console.log(req.query.user);
     user.registerUser(req.query.user, (err, rows) => {
         res.send(rows);
     });
@@ -183,6 +184,17 @@ app.delete('/szerzo/', (req, res) => {
     szerzo.deleteSzerzo(req.query.szerzo, (err, rows) => {
         res.send(rows);
     });
+});
+app.get('/login/', (req, res) => {
+    req.query.user = JSON.parse(req.query.user);
+    console.log(req.query.user);
+    user.getUserByUserName(req.query.user.felhasznalonev)
+        .then((result) => {
+            res.send(result);
+        })
+        .catch((err) => {
+            res.send(err);
+        });
 });
 
 app.listen(port, () => {

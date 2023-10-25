@@ -1,5 +1,7 @@
+import { Kiado } from "../Models/Kiado";
+
 class KiadoService {
-    async addNewKiado(kiado: any) {
+    async addNewKiado(kiado: Kiado) {
         const headers = {"Content-Type": "application/json", "Allow-Origin-Access-Control": "*"};
         const response = await fetch(`http://localhost:3001/kiado/?kiado=${encodeURIComponent(JSON.stringify(kiado))}`, {
             method: 'POST',

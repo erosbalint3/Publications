@@ -47,7 +47,7 @@ module.exports = {
             jogosultsag: user.jogosultsag
         };
 
-        connection.query('UPDATE Felhasznalo SET ? WHERE id=?', [payload, user.felhasznalonev], (err, rows, fields) => {
+        connection.query('UPDATE Felhasznalo SET ? WHERE felhasznalonev=?', [payload, user.felhasznalonev], (err, rows, fields) => {
             if (err) throw err;
             return callback(err, rows);
         });

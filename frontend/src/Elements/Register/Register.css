@@ -4,7 +4,7 @@ h1 {
     color: #333;
 }
 
-form {
+#formDiv {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -19,7 +19,7 @@ form {
     color: white;
 }
 
-form input {
+#formDiv input {
     width: 90%;
     height: 30px;
     margin-bottom: 10px;
@@ -28,16 +28,16 @@ form input {
     box-sizing: border-box;
 }
 
-form input:focus {
+#formDiv input:focus {
     outline: none;
     border: 1px solid #333;
 }
 
-form input::placeholder {
+#formDiv input::placeholder {
     color: #ccc;
 }
 
-form button {
+#formDiv button {
     width: 50%;
     height: 50px;
     margin-top: 10px;

@@ -2,5 +2,5 @@ export enum Jogosultsag {
 
     Admin = "ADMIN",
 
-    Felhasznalo = "FELHASZNALO",
+    Kutato = "KUTATO",
 };

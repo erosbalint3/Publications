@@ -1,5 +1,10 @@
 #profileText {
     width: 30%;
+    margin-top: -60px;
+}
+
+#profilePicture {
+    display: flex;
 }
 
 #profilePicture img {
@@ -14,7 +19,6 @@
 }
 
 #profileText div p {
-    margin: 5px;
     padding: 0;
     font-size: 14px;
     font-weight: bold;
