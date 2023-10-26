@@ -48,19 +48,27 @@ const Folyoiratok = () => {
 
     useEffect(() => {
         folyoiratService.getAllFolyoirat().then(setFolyoiratok);
-        if (startIndex == 0 && (!isLoggedIn || user.jogosultsag != "ADMIN")) {
-            alert('You are not logged in or you are not an admin!');
+        if (startIndex == 0 && (!isLoggedIn)) {
+            alert('You are not logged in');
             window.location.href = '/login';
             startIndex++;
         }
     }, []);
 
     const deleteFolyoirat = (row: Folyoirat) => {
+        if (!isLoggedIn || user.jogosultsag != "ADMIN") {
+            alert('You are not logged in or you are not an admin!');
+            return;
+        }
         folyoiratService.deleteFolyoirat(row);
         window.location.reload();
     }
 
     const handleOpen = (params: any) => {
+        if (!isLoggedIn || user.jogosultsag != "ADMIN") {
+            alert('You are not logged in or you are not an admin!');
+            return;
+        }
         setSelectedFolyoirat(params.row);
         setUpdateDialogOpen(true);
     };
@@ -69,6 +77,14 @@ const Folyoiratok = () => {
         folyoiratService.addNewFolyoirat({ ...addData, id: uuidv4() });
         setAddDialogOpen(false);
         window.location.reload();
+    };
+
+    const handleAddDialogOpen = () => {
+        if (!isLoggedIn || user.jogosultsag != "ADMIN") {
+            alert('You are not logged in or you are not an admin!');
+            return;
+        }
+        setAddDialogOpen(true);
     };
 
     const handleSave = () => {
@@ -80,7 +96,7 @@ const Folyoiratok = () => {
     
     return <div id="folyoiratokMain">
         <div id='ButtonsGroup'>
-            <button onClick={(params) => setAddDialogOpen(true)}>Add new</button>
+            <button onClick={() => handleAddDialogOpen()}>Add new</button>
         </div>
         <div>
             <DataGrid rows={folyoiratok} columns={columns} editMode='row'/>

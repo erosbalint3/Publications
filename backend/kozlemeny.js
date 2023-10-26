@@ -5,12 +5,11 @@ const connection = mysql.createConnection({
     password: '',
     database: 'publications',
     port: '3306',
-    debug: true
 });
 
 module.exports = {
     getAllKozlemeny: (callback) => {
-        connection.query('SELECT * FROM Kozlemeny', (err, rows) => {
+        connection.query('SELECT * FROM Kozlemeny WHERE elfogadva=1', (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });
@@ -69,5 +68,23 @@ module.exports = {
             if (err) throw err;
             return callback(err, rows);
         });
-    }
+    },
+    getKozlemenyWaitingForAcceptance(callback) {
+        connection.query('SELECT * FROM Kozlemeny WHERE elfogadva=0', (err, rows) => {
+            if (err) throw err;
+            return callback(err, rows);
+        });
+    },
+    acceptKozlemeny(id, callback) {
+        connection.query('UPDATE Kozlemeny SET elfogadva=1 WHERE id=?', [id], (err, rows) => {
+            if (err) throw err;
+            return callback(err, rows);
+        });
+    },
+    declineKozlemeny(id, callback) {
+        connection.query('DELETE FROM Kozlemeny WHERE id=?', [id], (err, rows) => {
+            if (err) throw err;
+            return callback(err, rows);
+        });
+    },
 };

@@ -63,7 +63,7 @@ const Kozlemenyek = () => {
                 });
             });
         });
-        if (startIndex == 0 && (!isLoggedIn || user.jogosultsag != "ADMIN")) {
+        if (startIndex == 0 && !isLoggedIn) {
             alert('You are not logged in!');
             window.location.href = '/login';
             startIndex++;

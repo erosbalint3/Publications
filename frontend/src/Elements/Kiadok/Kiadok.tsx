@@ -47,7 +47,7 @@ const Kiadok = () => {
         kiadoService.getAllKiado().then((response) => {
             setKiadok(response);
         });
-        if (startIndex == 0 && (!isLoggedIn || user.jogosultsag != "ADMIN")) {
+        if (startIndex == 0 && !isLoggedIn) {
             alert('You are not logged in!');
             window.location.href = '/login';
             startIndex++;
@@ -55,20 +55,40 @@ const Kiadok = () => {
     }, []);
 
     const deleteKiado = (row: Kiado) => {
+        if (!isLoggedIn || user.jogosultsag != "ADMIN") {
+            alert('You are not logged in or you are not an admin!');
+            return;
+        }
         kiadoService.deleteKiado(row);
         window.location.reload();
     }
 
     const handleOpen = (params: any) => {
+        if (!isLoggedIn || user.jogosultsag != "ADMIN") {
+            alert('You are not logged in or you are not an admin!');
+            return;
+        }
         setSelectedKiado(params.row);
         setUpdateDialogOpen(true);
     };
 
     const handleAdd = () => {
+        if (!isLoggedIn || user.jogosultsag != "ADMIN") {
+            alert('You are not logged in or you are not an admin!');
+            return;
+        }
         kiadoService.addNewKiado(addData);
         setAddDialogOpen(false);
         window.location.reload();
     };
+
+    const handleAddDialogOpen = () => {
+        if (!isLoggedIn || user.jogosultsag != "ADMIN") {
+            alert('You are not logged in or you are not an admin!');
+            return;
+        }
+        setAddDialogOpen(true);
+    }
 
     const handleSave = () => {
         kiadoService.saveKiado(selectedKiado!);
@@ -79,7 +99,7 @@ const Kiadok = () => {
     return (
         <div id='kiadokMain'>
             <div id='ButtonsGroup'>
-                <button onClick={() => setAddDialogOpen(true)}>Add new</button>
+                <button onClick={() => handleAddDialogOpen()}>Add new</button>
             </div>
             <div>
                 <DataGrid rows={kiadok} columns={columns} editMode='row' getRowId={(row) => row.nev}/>

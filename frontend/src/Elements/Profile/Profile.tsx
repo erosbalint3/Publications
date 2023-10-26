@@ -1,8 +1,10 @@
 import "./Profile.css";
 import { ReactSession } from "react-client-session";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UserService from "../../Services/userService";
 import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText } from "@mui/material";
+import { Snackbar } from '@mui/material';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
 const userService = new UserService();
 
@@ -10,14 +12,36 @@ const Profile = () => {
     const user = ReactSession.get('user');
     const isLoggedIn = ReactSession.get('isLoggedIn');
 
-    const [firstName, setFirstName] = useState(user.keresztnev);
-    const [lastName, setLastName] = useState(user.vezeteknev);
-    const [email, setEmail] = useState(user.email);
+    const [firstName, setFirstName] = useState(user?.keresztnev);
+    const [lastName, setLastName] = useState(user?.vezeteknev);
+    const [email, setEmail] = useState(user?.email);
     const [currentPassword, setCurrentPasswrd] = useState('');
     const [password, setPassword] = useState('');
     const [password2, setPassword2] = useState('');
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [updatePasswordDialogOpen, setUpdatePasswordDialogOpen] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+    let startIndex = 0;
+
+    const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+        props,
+        ref,
+    ) {
+        return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    });
+
+    useEffect(() => {
+        if (!isLoggedIn) {
+            alert('You are not logged in!');
+            window.location.href = '/login';
+        } else {
+            if (startIndex == 0) {
+                setSnackbarOpen(true);
+                startIndex++;
+            }
+        }
+    }, []);
 
     const handleSave = () => {
         userService.saveUser({...user, keresztnev: firstName, vezeteknev: lastName, email: email});
@@ -34,6 +58,11 @@ const Profile = () => {
 
     return (
         <div id="profileMain">
+            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}>
+                <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%', zIndex: 100000 }}>
+                    Login successful!
+                </Alert>
+            </Snackbar>
             <div id="headerButtons">
                 <button onClick={() => setUpdateDialogOpen(true)}>Update profile</button>
                 <button>Delete profile</button>
@@ -160,7 +189,9 @@ const Profile = () => {
                     </DialogActions>
                 </Dialog>
             </div>
+            
         </div>
+        
     )
 }
 

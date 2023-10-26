@@ -52,8 +52,8 @@ const Szerzok = () => {
 
     useEffect(() => {
         szerzoService.getAllSzerzo().then(data => setSzerzok(data));
-        if (startIndex == 0 && (!isLoggedIn || user.jogosultsag != "ADMIN")) {
-            alert('You are not logged in or you are not an admin!');
+        if (startIndex == 0 && !isLoggedIn) {
+            alert('You are not logged in');
             window.location.href = '/login';
             startIndex++;
         }

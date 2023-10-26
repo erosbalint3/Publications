@@ -187,7 +187,6 @@ app.delete('/szerzo/', (req, res) => {
 });
 app.get('/login/', (req, res) => {
     req.query.user = JSON.parse(req.query.user);
-    console.log(req.query.user);
     user.getUserByUserName(req.query.user.felhasznalonev)
         .then((result) => {
             res.send(result);
@@ -196,6 +195,22 @@ app.get('/login/', (req, res) => {
             res.send(err);
         });
 });
+app.get('/acceptance/', (req, res) => {
+    kozlemeny.getKozlemenyWaitingForAcceptance((err, rows) => {
+        res.send(rows);
+    });
+});
+app.post('/acceptance/', (req, res) => {
+    kozlemeny.acceptKozlemeny(req.query.kozlemenyId, (err, rows) => {
+        res.send(rows);
+    });
+});
+app.delete('/acceptance/', (req, res) => {
+    kozlemeny.declineKozlemeny(req.query.kozlemenyId, (err, rows) => {
+        res.send(rows);
+    });
+});
+
 
 app.listen(port, () => {
     console.log(`this app runs in port: ${port}`);
