@@ -14,6 +14,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import { ReactSession } from 'react-client-session';
 import { Kiado } from '../../Models/Kiado';
 import KiadoService from '../../Services/kiadoService';
+import { alignProperty } from '@mui/material/styles/cssUtils';
 
 const kozlemenyService = new KozlemenyService();
 const szerzoService = new SzerzoService();
@@ -47,7 +48,7 @@ const Kozlemenyek = () => {
     };
 
     const handleAdd = () => {
-        kozlemenyService.addNewKozlemeny({...addData, id: uuidv4()});
+        kozlemenyService.addNewKozlemeny({...addData, id: uuidv4(), felhasznalonev: user?.felhasznalonev!});
         setAddDialogOpen(false);
         window.location.reload();
     };
@@ -83,13 +84,31 @@ const Kozlemenyek = () => {
         }
     }, []);
 
+    function dynamicSort(property: keyof Kozlemeny) {
+        var sortOrder = 1;
+        if(property[0] === "-") {
+            sortOrder = -1;
+        }
+        return function (a: Kozlemeny,b: Kozlemeny) {
+            var result = (a[property]! < b[property]!) ? -1 : (a[property]! > b[property]!) ? 1 : 0;
+            return result * sortOrder;
+        }
+    }
+
     useEffect(() => {
         let array: number[] = [];
-        kozlemenyek.forEach((kozlemeny) => {
-            let count = kozlemenyek.filter((kozl) => kozl.kiadas_eve == kozlemeny.kiadas_eve).length;
-            array.push(count);
+        let usedUpEvek: number[] = [];
+        const sortedKozlemenyek = [...kozlemenyek].sort(dynamicSort('kiadas_eve'));
+        sortedKozlemenyek.forEach((kozlemeny) => {
+            let count = kozlemenyek.filter((kozl) => kozl.kiadas_eve == kozlemeny.kiadas_eve && kozl.felhasznalonev == user.felhasznalonev).length;
+            if (!usedUpEvek.includes(kozlemeny.kiadas_eve)) {
+                usedUpEvek.push(kozlemeny.kiadas_eve);
+                array.push(parseInt(count.toString()));
+            }
         });
         setKiadasEveGroup(array);
+        console.log(kiadasEveGroup);
+
     }, [kozlemenyek]);
 
     const handleFilterByKiado = () => {
@@ -282,21 +301,28 @@ const Kozlemenyek = () => {
                     <Button onClick={() => handleSave()}>Save</Button>
                 </DialogActions>
             </Dialog>
+            <h1 style={{textAlign: 'left', marginLeft: '5px'}}>Saját közlemények évenkénti statisztikája</h1>
             {kiadasEveGroup.length > 0 &&<BarChart
                         disableAxisListener
                         xAxis={[
                             {
                                 id: 'kiadasEvei',
-                                data: kozlemenyek.map((kozlemeny) => kozlemeny.kiadas_eve),
+                                data: kozlemenyek.filter((value, index, self) => self.indexOf(value) === index).filter((kozlemeny) => kozlemeny.felhasznalonev == user?.felhasznalonev).map((kozlemeny) => kozlemeny.kiadas_eve).sort(),
                                 scaleType: 'band',
+                            }
+                        ]}
+                        yAxis={[
+                            {
+                                valueFormatter: (params) => {
+                                    return params.toFixed(0);
+                                }
                             }
                         ]}
                         series={[
                             {
-                                data: kiadasEveGroup,
+                                data: kiadasEveGroup
                             }
                         ]}
-                        width={500}
                         height={300}
                         
                     />
