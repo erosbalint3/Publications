@@ -38,6 +38,15 @@ class UserService {
         });
         return await response.json();
     }
+
+    async getAllUser() {
+        const headers = {'Content-Type': 'application/json', 'Allow-Origin-Access-Control': '*'};
+        const response = await fetch(`http://localhost:3001/user/all`, {
+            method: 'GET',
+            headers: headers,
+        });
+        return await response.json();
+    }
 }
 
 export default UserService;

@@ -57,6 +57,12 @@ module.exports = {
             if (err) throw err;
             return callback(err, rows);
         });
-    } 
+    },
+    getAllUser: (callback) => {
+        connection.query('SELECT * FROM Felhasznalo', (err, rows) => {
+            if (err) throw err;
+            return callback(err, rows);
+        });
+    }
 
 };

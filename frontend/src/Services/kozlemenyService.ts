@@ -36,6 +36,15 @@ class KozlemenyService {
         });
         return await response.json();
     };
+
+    async getKozlemenyByKiado(kiado: string) {
+        const headers = {"Content-Type": "application/json", "Allow-Origin-Access-Control": "*"};
+        const response = await fetch(`http://localhost:3001/kozlemeny/kiado/?kiado=${encodeURIComponent(kiado)}`, {
+            method: 'GET',
+            headers: headers
+        });
+        return await response.json();
+    }
 }
 
 export default KozlemenyService;

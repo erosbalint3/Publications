@@ -87,4 +87,10 @@ module.exports = {
             return callback(err, rows);
         });
     },
+    getKozlemenyekByKiadoNev(kiado_nev, callback) {
+        connection.query('SELECT Kozlemeny.cim, Kozlemeny.elfogadva, Kozlemeny.felhasznalonev, Kozlemeny.folyoirat_azon, Kozlemeny.id, Kozlemeny.kiadas_eve FROM Kozlemeny, Folyoirat WHERE Kozlemeny.folyoirat_azon = Folyoirat.id AND Folyoirat.kiado=?', [kiado_nev], (err, rows) => {
+            if (err) throw err;
+            return callback(err, rows);
+        });
+    }
 };

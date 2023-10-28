@@ -13,6 +13,7 @@ import { ReactSession } from 'react-client-session';
 import { Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import Acceptance from './Elements/Acceptance/Acceptance';
+import AllProfile from './Elements/AllProfile/AllProfile';
 
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
             <Link to="/kiadok">Kiadók</Link>
             <Link to="/folyoiratok">Folyóiratok</Link>
             {user?.jogosultsag == "ADMIN" && <Link to='/jovahagyas'>Közlemények jóváhagyása</Link>}
+            {user?.jogosultsag == "ADMIN" && <Link to='/osszesProfil'>Összes felhasználó</Link>}
             <Link to="#" onClick={async () => {
               ReactSession.set("isLoggedIn", false);
               ReactSession.set("user", null); 
@@ -66,6 +68,7 @@ function App() {
             <Route path="/kiadok" Component={Kiadok} />
             <Route path="/folyoiratok" Component={Folyoiratok!} />
             <Route path='/jovahagyas' Component={Acceptance!} />
+            <Route path='/osszesProfil' Component={AllProfile!} />
           </Routes>
         </div>
       </BrowserRouter>

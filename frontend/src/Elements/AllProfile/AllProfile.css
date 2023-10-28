@@ -1,0 +1,8 @@
+#mainTable {
+    margin-top: 50px;
+    margin-bottom: 20px;
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+    font-size: 18px;
+}

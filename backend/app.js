@@ -210,6 +210,16 @@ app.delete('/acceptance/', (req, res) => {
         res.send(rows);
     });
 });
+app.get('/kozlemeny/kiado/', (req, res) => {
+    kozlemeny.getKozlemenyekByKiadoNev(req.query.kiado, (err, rows) => {
+        res.send(rows);
+    });
+});
+app.get('/user/all', (req, res) => {
+    user.getAllUser((err, rows) => {
+        res.send(rows);
+    });
+});
 
 
 app.listen(port, () => {

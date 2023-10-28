@@ -4,16 +4,20 @@ import { GridColDef } from '@mui/x-data-grid';
 import { Kozlemeny } from '../../Models/Kozlemeny';
 import { v4 as uuidv4 } from 'uuid';
 import KozlemenyService from '../../Services/kozlemenyService';
-import { MenuItem, Select, TextField, Dialog, DialogTitle, DialogContent, Button } from '@mui/material';
+import { MenuItem, Select, TextField, Dialog, DialogTitle, DialogContent, Button, Autocomplete } from '@mui/material';
+import { BarChart } from '@mui/x-charts/BarChart';
 import './Kozlemenyek.css';
 import SzerzoService from '../../Services/szerzoService';
 import { Szerzo } from '../../Models/Szerzo';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContentText from '@mui/material/DialogContentText';
 import { ReactSession } from 'react-client-session';
+import { Kiado } from '../../Models/Kiado';
+import KiadoService from '../../Services/kiadoService';
 
 const kozlemenyService = new KozlemenyService();
 const szerzoService = new SzerzoService();
+const kiadoService = new KiadoService();
 
 const deleteKozlemeny = (kozlemeny: Kozlemeny) => {
     kozlemenyService.deleteKozlemeny(kozlemeny);
@@ -27,6 +31,10 @@ const Kozlemenyek = () => {
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [selectedKozlemeny, setSelectedKozlemeny] = useState<Kozlemeny>();
     const [addData, setAddData] = useState<Kozlemeny>({id: '', cim: '', folyoirat_azon: '', kiadas_eve: 0, szerzoi: [], felhasznalonev: ''});
+    const [kiadok, setKiadok] = useState<Kiado[]>([]);
+    const [filterByKiadoDialogOpen, setFilterByKiadoDialogOpen] = useState(false);
+    const [selectedKiadok, setSelectedKiadok] = useState<string[]>([]);
+    const [kiadasEveGroup, setKiadasEveGroup] = useState<number[]>([]);
 
     const user = ReactSession.get('user');
     const isLoggedIn = ReactSession.get('isLoggedIn');
@@ -50,6 +58,8 @@ const Kozlemenyek = () => {
         window.location.reload();
     };
 
+    
+
     useEffect(() => {
          kozlemenyService.getAllKozlemeny().then((kozlemenyek) => {
             setKozlemenyek(kozlemenyek);
@@ -63,12 +73,39 @@ const Kozlemenyek = () => {
                 });
             });
         });
+        kiadoService.getAllKiado().then((kiadok) => {
+            setKiadok(kiadok);
+        });
         if (startIndex == 0 && !isLoggedIn) {
             alert('You are not logged in!');
             window.location.href = '/login';
             startIndex++;
         }
     }, []);
+
+    useEffect(() => {
+        let array: number[] = [];
+        kozlemenyek.forEach((kozlemeny) => {
+            let count = kozlemenyek.filter((kozl) => kozl.kiadas_eve == kozlemeny.kiadas_eve).length;
+            array.push(count);
+        });
+        setKiadasEveGroup(array);
+    }, [kozlemenyek]);
+
+    const handleFilterByKiado = () => {
+        const kiadoSelect = document.getElementById('kiadoSelect') as HTMLSelectElement;
+        const kiado = kiadoSelect.value;
+        kozlemenyService.getKozlemenyByKiado(selectedKiadok[0]).then((kozl: Kozlemeny[]) => {
+            setKozlemenyek(kozl);
+            kozlemenyek.map((kozlElement: Kozlemeny) => {
+                szerzoService.getSzerzoByKozlemeny(kozlElement.id).then((szerzoData) => {
+                    kozlElement.szerzoi = szerzoData.map((szerzo) => szerzo.nev);
+                    setKozlemenyek([...kozlemenyek]);
+                });
+            });
+        });
+        setFilterByKiadoDialogOpen(false);
+    };
 
     const columns: GridColDef[] = [
         {
@@ -98,15 +135,34 @@ const Kozlemenyek = () => {
             }            
         },
     ];
+    
 
     return (
         <div id='kozlemenyekMain'>
             <div id='ButtonsGroup'>
                 <button onClick={() => setAddDialogOpen(true)}>Add new</button>
+                <button onClick={() => setFilterByKiadoDialogOpen(true)}>Filter by Kiado</button>
             </div>
             <div>
                 <DataGrid rows={kozlemenyek} columns={columns}/>
+                
             </div>
+            <Dialog open={filterByKiadoDialogOpen} onClose={() => setFilterByKiadoDialogOpen(false)}>
+                <DialogContent>
+                    <Autocomplete 
+                        id='kiadoSelect'
+                        options={kiadok.map((kiado) => kiado.nev)}
+                        value={selectedKiadok}
+                        multiple
+                        getOptionLabel={(option) => option}
+                        sx={{width: 300}}
+                        renderInput={(params) => <TextField {...params} label='Kiadó' variant='standard'/>}
+                        onChange={(event, value) => setSelectedKiadok(value)}
+                    />
+                    <Button onClick={() => handleFilterByKiado()} sx={{ mt: 5}}>Filter</Button>
+                    <Button onClick={() => setFilterByKiadoDialogOpen(false)} sx={{ mt: 5}}>Cancel</Button>
+                </DialogContent>
+            </Dialog>
             <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
                 <DialogTitle>Subscribe</DialogTitle>
                 <DialogContent>
@@ -226,6 +282,25 @@ const Kozlemenyek = () => {
                     <Button onClick={() => handleSave()}>Save</Button>
                 </DialogActions>
             </Dialog>
+            {kiadasEveGroup.length > 0 &&<BarChart
+                        disableAxisListener
+                        xAxis={[
+                            {
+                                id: 'kiadasEvei',
+                                data: kozlemenyek.map((kozlemeny) => kozlemeny.kiadas_eve),
+                                scaleType: 'band',
+                            }
+                        ]}
+                        series={[
+                            {
+                                data: kiadasEveGroup,
+                            }
+                        ]}
+                        width={500}
+                        height={300}
+                        
+                    />
+                }
         </div>
     )
 };
