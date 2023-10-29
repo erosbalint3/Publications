@@ -22,7 +22,7 @@ module.exports = {
         });
     },
     getFolyoiratokByKiado: (kiado_nev, callback) => {
-        connection.query('SELECT * FROM Folyoirat WHERE Folyoirat.kiado =?', [kiado_nev], (err, rows) => {
+        connection.query('SELECT * FROM Folyoirat WHERE Folyoirat.kiado=?', [kiado_nev], (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });

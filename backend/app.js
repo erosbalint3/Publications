@@ -83,6 +83,11 @@ app.delete('/kozlemeny/', (req, res) => {
         res.send(rows);
     });
 });
+app.get('/folyoirat/kiado/', (req, res) => {
+    folyoirat.getFolyoiratokByKiado(req.query.kiado, (err, rows) => {
+        res.send(rows);
+    });
+});
 
 app.get('/kiado', (req, res) => {
     kiado.getAllKiado((err, rows) => {

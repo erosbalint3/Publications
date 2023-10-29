@@ -74,7 +74,7 @@ const Folyoiratok = () => {
     };
 
     const handleAdd = () => {
-        folyoiratService.addNewFolyoirat({ ...addData, id: uuidv4() });
+        folyoiratService.addNewFolyoirat({ ...addData, id: uuidv4(), szerkeszto: user.felhasznalonev });
         setAddDialogOpen(false);
         window.location.reload();
     };

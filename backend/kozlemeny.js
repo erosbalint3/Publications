@@ -58,16 +58,16 @@ module.exports = {
     },
     addKozlemeny: (kozlemeny, callback) => {
         console.log(kozlemeny);
+        connection.query('INSERT INTO Kozlemeny SET id=?, cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=?', [kozlemeny.id, kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev], (err, rows) => {
+            if (err) throw err;
+            return callback(err, rows);
+        });
         kozlemeny.szerzoi.forEach(element => {
             connection.query('INSERT INTO szerzoi SET szerzo_id=?, kozl_id=?', [element, kozlemeny.id], (err, rows) => {
                 if (err) throw err;
             }); 
         });
 
-        connection.query('INSERT INTO Kozlemeny SET id=?, cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=?', [kozlemeny.id, kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev], (err, rows) => {
-            if (err) throw err;
-            return callback(err, rows);
-        });
     },
     getKozlemenyWaitingForAcceptance(callback) {
         connection.query('SELECT * FROM Kozlemeny WHERE elfogadva=0', (err, rows) => {

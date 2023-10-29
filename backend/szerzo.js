@@ -16,7 +16,7 @@ module.exports = {
         });
     },
     getSzerzoByKozlemeny: (kozlemeny, callback) => {
-        connection.query('SELECT DISTINCT Szerzo.nev FROM Szerzo, szerzoi, Kozlemeny WHERE szerzoi.szerzo_id = Szerzo.nev AND szerzoi.kozl_id = Kozlemeny.id AND Kozlemeny.id=?', [kozlemeny], (err, rows) => {
+        connection.query('SELECT DISTINCT Szerzo.nev FROM Szerzo, szerzoi, Kozlemeny WHERE szerzoi.szerzo_id = Szerzo.id AND szerzoi.kozl_id = Kozlemeny.id AND Kozlemeny.id=?', [kozlemeny], (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });

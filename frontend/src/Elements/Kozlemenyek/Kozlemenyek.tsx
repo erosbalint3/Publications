@@ -15,10 +15,13 @@ import { ReactSession } from 'react-client-session';
 import { Kiado } from '../../Models/Kiado';
 import KiadoService from '../../Services/kiadoService';
 import { alignProperty } from '@mui/material/styles/cssUtils';
+import { Folyoirat } from '../../Models/Folyoirat';
+import FolyoiratService from '../../Services/folyoiratService';
 
 const kozlemenyService = new KozlemenyService();
 const szerzoService = new SzerzoService();
 const kiadoService = new KiadoService();
+const folyoiratService = new FolyoiratService();
 
 const deleteKozlemeny = (kozlemeny: Kozlemeny) => {
     kozlemenyService.deleteKozlemeny(kozlemeny);
@@ -28,6 +31,7 @@ const deleteKozlemeny = (kozlemeny: Kozlemeny) => {
 const Kozlemenyek = () => {
     const [kozlemenyek, setKozlemenyek] = useState<Kozlemeny[]>([]);
     const [szerzok, setSzerzok] = useState<Szerzo[]>([]);
+    const [folyoiratok, setFolyoiratok] = useState<Folyoirat[]>([]);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [selectedKozlemeny, setSelectedKozlemeny] = useState<Kozlemeny>();
@@ -36,6 +40,7 @@ const Kozlemenyek = () => {
     const [filterByKiadoDialogOpen, setFilterByKiadoDialogOpen] = useState(false);
     const [selectedKiadok, setSelectedKiadok] = useState<string[]>([]);
     const [kiadasEveGroup, setKiadasEveGroup] = useState<number[]>([]);
+    const [filtered, setFiltered] = useState<boolean>(false);
 
     const user = ReactSession.get('user');
     const isLoggedIn = ReactSession.get('isLoggedIn');
@@ -63,7 +68,9 @@ const Kozlemenyek = () => {
 
     useEffect(() => {
          kozlemenyService.getAllKozlemeny().then((kozlemenyek) => {
-            setKozlemenyek(kozlemenyek);
+            if (!filtered) {
+                setKozlemenyek(kozlemenyek);
+            }
             szerzoService.getAllSzerzo().then((szerzok) => {
                 setSzerzok(szerzok);
             });
@@ -77,12 +84,20 @@ const Kozlemenyek = () => {
         kiadoService.getAllKiado().then((kiadok) => {
             setKiadok(kiadok);
         });
+        folyoiratService.getAllFolyoirat().then((folyoiratok) => {
+            setFolyoiratok(folyoiratok);
+        });
         if (startIndex == 0 && !isLoggedIn) {
             alert('You are not logged in!');
             window.location.href = '/login';
             startIndex++;
         }
+        console.log(kozlemenyek);
     }, []);
+
+    const getFolyoiratNevById = (id: string) => {
+        return folyoiratok.find((folyoirat) => folyoirat.id == id)?.nev;
+    }
 
     function dynamicSort(property: keyof Kozlemeny) {
         var sortOrder = 1;
@@ -107,22 +122,25 @@ const Kozlemenyek = () => {
             }
         });
         setKiadasEveGroup(array);
-        console.log(kiadasEveGroup);
 
     }, [kozlemenyek]);
 
-    const handleFilterByKiado = () => {
+    const handleFilterByKiado = async () => {
         const kiadoSelect = document.getElementById('kiadoSelect') as HTMLSelectElement;
         const kiado = kiadoSelect.value;
         kozlemenyService.getKozlemenyByKiado(selectedKiadok[0]).then((kozl: Kozlemeny[]) => {
             setKozlemenyek(kozl);
-            kozlemenyek.map((kozlElement: Kozlemeny) => {
-                szerzoService.getSzerzoByKozlemeny(kozlElement.id).then((szerzoData) => {
-                    kozlElement.szerzoi = szerzoData.map((szerzo) => szerzo.nev);
-                    setKozlemenyek([...kozlemenyek]);
-                });
+            kozlemenyek.map(async (kozlElement: Kozlemeny) => {
+                const folyoirat = await folyoiratService.getFolyoiratByKiado(kiado);
+                if (kozlElement.folyoirat_azon == folyoirat.id) {
+                    szerzoService.getSzerzoByKozlemeny(kozlElement.id).then((szerzoData) => {
+                        kozlElement.szerzoi = szerzoData.map((szerzo) => szerzo.nev);
+                        setKozlemenyek(oldArray => [...oldArray, kozlElement]);
+                    });
+                }
             });
         });
+        
         setFilterByKiadoDialogOpen(false);
     };
 
@@ -142,7 +160,7 @@ const Kozlemenyek = () => {
         },
         {field: 'id', headerName: 'ID', width: 200},
         {field: 'cim', headerName: 'Cím', width: 200},
-        {field: 'folyoirat_azon', headerName: 'Folyóirat azonosító', width: 200},
+        {field: 'folyoirat_azon', headerName: 'Folyóirat azonosító', width: 200, valueGetter: (params) => getFolyoiratNevById(params.row.folyoirat_azon)},
         {field: 'kiadas_eve', headerName: 'Kiadás éve', width: 200},
         {
             field: 'szerzoi', 
@@ -198,19 +216,14 @@ const Kozlemenyek = () => {
                             setAddData({ ...addData, cim: event.target.value });
                         }}
                     />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="Folyóirat azonosító"
-                        label="Folyóirat azonosító"
-                        type="text"
-                        value={addData?.folyoirat_azon}
-                        fullWidth
-                        variant="standard"
-                        onChange={(event) => {
-                            setAddData({ ...addData, folyoirat_azon: event.target.value });
-                        }}
-                    />
+                    <Select value={addData?.folyoirat_azon} sx={{width: 200, color: "black"}} onChange={(params) => setAddData({ ...addData, folyoirat_azon: params.target.value as string})}>
+                        {folyoiratok.map((folyoirat) => (
+                            <MenuItem 
+                                key={folyoirat.nev}
+                                value={folyoirat.id}
+                            >{folyoirat.nev}</MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         autoFocus
                         margin="dense"
@@ -226,13 +239,13 @@ const Kozlemenyek = () => {
                         }}
                     />
                     <Select multiple value={addData?.szerzoi} sx={{width: 200, color: "black"}} onChange={(params) => setAddData({ ...addData, szerzoi: params.target.value as string[]})}>
-                            {szerzok.map((szerzo) => (
-                                <MenuItem 
-                                    key={szerzo.nev}
-                                    value={szerzo.nev}
-                                >{szerzo.nev}</MenuItem>
-                            ))}
-                        </Select>
+                        {szerzok.map((szerzo) => (
+                            <MenuItem 
+                                key={szerzo.nev}
+                                value={szerzo.id}
+                            >{szerzo.nev}</MenuItem>
+                        ))}
+                    </Select>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
@@ -258,19 +271,14 @@ const Kozlemenyek = () => {
                             setSelectedKozlemeny({ ...selectedKozlemeny, cim: event.target.value! } as Kozlemeny);
                         }}
                     />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="Folyóirat azonosító"
-                        label="Folyóirat azonosító"
-                        type="text"
-                        value={selectedKozlemeny?.folyoirat_azon}
-                        fullWidth
-                        variant="standard"
-                        onChange={(event) => {
-                            setSelectedKozlemeny({ ...selectedKozlemeny, folyoirat_azon: event.target.value! } as Kozlemeny);
-                        }}
-                    />
+                    <Select value={selectedKozlemeny?.folyoirat_azon} sx={{width: 200, color: "black"}} onChange={(params) => setSelectedKozlemeny({ ...selectedKozlemeny, folyoirat_azon: params.target.value as string} as Kozlemeny)}>
+                        {folyoiratok.map((folyoirat) => (
+                            <MenuItem 
+                                key={folyoirat.nev}
+                                value={folyoirat.id}
+                            >{folyoirat.nev}</MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         autoFocus
                         margin="dense"

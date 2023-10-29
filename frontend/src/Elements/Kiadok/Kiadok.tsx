@@ -16,7 +16,7 @@ const Kiadok = () => {
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [selectedKiado, setSelectedKiado] = useState<Kiado>();
-    const [addData, setAddData] = useState<Kiado>({ nev: '', telefonszam: '', szekhely: '' });
+    const [addData, setAddData] = useState<Kiado>({ nev: '', telefonszam: '', szekhely: '', szerkeszto: '' });
 
     const user = ReactSession.get('user');
     const isLoggedIn = ReactSession.get('isLoggedIn');
@@ -77,7 +77,7 @@ const Kiadok = () => {
             alert('You are not logged in or you are not an admin!');
             return;
         }
-        kiadoService.addNewKiado(addData);
+        kiadoService.addNewKiado({ ...addData, szerkeszto: user.felhasznalonev });
         setAddDialogOpen(false);
         window.location.reload();
     };

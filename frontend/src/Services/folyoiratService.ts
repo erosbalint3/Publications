@@ -34,6 +34,15 @@ class FolyoiratService {
         });
         return await response.json();
     }
+
+    async getFolyoiratByKiado(kiado: string) {
+        const headers = {"Content-Type": "application/json", "Allow-Origin-Access-Control": "*"};
+        const response = await fetch(`http://localhost:3001/folyoirat/kiado/?kiado=${encodeURIComponent(JSON.stringify({'kiado': kiado}))}`, {
+            method: 'GET',
+            headers: headers
+        });
+        return await response.json();
+    }
 }
 
 export default FolyoiratService;
