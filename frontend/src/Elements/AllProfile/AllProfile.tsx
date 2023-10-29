@@ -17,6 +17,8 @@ const AllProfile = () => {
 
     const columns: GridColDef[] = [
         {field: 'felhasznalonev', headerName: 'Felhasználónév', width: 200, editable: false},
+        {field: 'keresztnev', headerName: 'keresztnev', width: 200, editable: false},
+        {field: 'vezeteknev', headerName: 'vezeteknev', width: 200, editable: false},
         {field: 'email', headerName: 'Email', width: 200, editable: false},
         {field: 'jogosultsag', headerName: 'Jogosultság', width: 200, editable: false},
     ];

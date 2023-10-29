@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Login.css';
 import { ReactSession } from 'react-client-session';
 import { compareSync } from 'bcrypt-ts';
 import { Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
 
@@ -18,9 +19,13 @@ const Login = () => {
     const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
         props,
         ref,
-      ) {
+    ) {
         return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-      });
+    });
+
+    useEffect(() => {
+        
+    }, []);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

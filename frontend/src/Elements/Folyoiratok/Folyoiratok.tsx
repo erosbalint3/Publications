@@ -3,25 +3,31 @@ import { DataGrid } from '@mui/x-data-grid';
 import { GridRowsProp } from '@mui/x-data-grid';
 import { GridColDef } from '@mui/x-data-grid';
 import { Folyoirat } from '../../Models/Folyoirat';
+import { Kiado } from '../../Models/Kiado';
 import { v4 as uuidv4 } from 'uuid';
 import './Folyoiratok.css';
 import { useEffect } from "react";
 import FolyoiratService from "../../Services/folyoiratService";
+import KiadoService from "../../Services/kiadoService";
 import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText, Alert, Stack } from "@mui/material";
 import { ReactSession } from "react-client-session";
 
 const folyoiratService = new FolyoiratService();
+const kiadoService = new KiadoService();
 
 const Folyoiratok = () => {
+    const user = ReactSession.get('user');
+    const isLoggedIn = ReactSession.get('isLoggedIn');
+
     const [folyoiratok, setFolyoiratok] = useState<Folyoirat[]>([]);
+    const [kiadok, setKiadok] = useState<Kiado[]>([]);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [selectedFolyoirat, setSelectedFolyoirat] = useState<Folyoirat>();
-    const [addData, setAddData] = useState<Folyoirat>({ id: '', nev: '', szerkeszto: '', nyelv: '', minosites: 0, kiado: '' });
+    const [addData, setAddData] = useState<Folyoirat>({ id: '', nev: '', szerkeszto: user.felhaszanlonev, nyelv: '', minosites: 0, kiado: '' });
     let startIndex = 0;
 
-    const user = ReactSession.get('user');
-    const isLoggedIn = ReactSession.get('isLoggedIn');
+    
 
     const columns: GridColDef[] = [
         {
@@ -48,6 +54,7 @@ const Folyoiratok = () => {
 
     useEffect(() => {
         folyoiratService.getAllFolyoirat().then(setFolyoiratok);
+        kiadoService.getAllKiado().then(setKiadok);
         if (startIndex == 0 && (!isLoggedIn)) {
             alert('You are not logged in');
             window.location.href = '/login';
@@ -120,19 +127,6 @@ const Folyoiratok = () => {
                 <TextField
                     autoFocus
                     margin="dense"
-                    id="szerkeszto"
-                    label="Szerkesztő"
-                    type="text"
-                    value={addData?.szerkeszto}
-                    fullWidth
-                    variant="standard"
-                    onChange={(event) => {
-                        setAddData({ ...addData, szerkeszto: event.target.value });
-                    }}
-                />
-                <TextField
-                    autoFocus
-                    margin="dense"
                     id="nyelv"
                     label="Nyelv"
                     value={addData?.nyelv}
@@ -158,20 +152,14 @@ const Folyoiratok = () => {
                         setAddData({ ...addData, minosites: parseInt(event.target.value) | 0 });
                     }}
                 />
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="kiado"
-                    label="Kiadó"
-                    value={addData?.kiado}
-                    type="text"
-                    InputLabelProps={{ shrink: true }}
-                    fullWidth
-                    variant="standard"
-                    onChange={(event) => {
-                        setAddData({ ...addData, kiado: event.target.value });
-                    }}
-                />
+                <Select value={addData?.kiado} sx={{width: 200, color: "black"}} onChange={(params) => setAddData({ ...addData, kiado: params.target.value})}>
+                    {kiadok.map((kiado) => (
+                        <MenuItem 
+                            key={kiado.nev}
+                            value={kiado.nev}
+                        >{kiado.nev}</MenuItem>
+                    ))}
+                </Select>
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
@@ -235,20 +223,14 @@ const Folyoiratok = () => {
                         setSelectedFolyoirat({ ...selectedFolyoirat, minosites: parseInt(event.target.value!) } as Folyoirat);
                     }}
                 />
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="kiado"
-                    label="Kiadó"
-                    value={selectedFolyoirat?.kiado}
-                    type="text"
-                    InputLabelProps={{ shrink: true }}
-                    fullWidth
-                    variant="standard"
-                    onChange={(event) => {
-                        setSelectedFolyoirat({ ...selectedFolyoirat, kiado: event.target.value! } as Folyoirat);
-                    }}
-                />
+                <Select value={selectedFolyoirat?.kiado} sx={{width: 200, color: "black"}} onChange={(params) => setAddData({ ...addData, kiado: params.target.value})}>
+                    {kiadok.map((kiado) => (
+                        <MenuItem 
+                            key={kiado.nev}
+                            value={kiado.nev}
+                        >{kiado.nev}</MenuItem>
+                    ))}
+                </Select>
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => setUpdateDialogOpen(false)}>Cancel</Button>

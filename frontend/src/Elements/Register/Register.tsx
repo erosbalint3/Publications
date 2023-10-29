@@ -3,6 +3,8 @@ import UserService from '../../Services/userService';
 import './Register.css';
 import { Jogosultsag } from '../../Enums/Jogosultsag';
 import { genSaltSync, hash, hashSync } from "bcrypt-ts";
+import { Snackbar } from '@mui/material';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
 const Register = () => {
 
@@ -13,8 +15,18 @@ const Register = () => {
     const [vezeteknev, setVezeteknev] = useState<string>('');
     const [keresztnev, setKeresztnev] = useState<string>('');
     const [email, setEmail] = useState<string>('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [failedSnacbarOpen, setFailedSnackbarOpen] = useState(false);
 
-    const register = () => {
+    const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+        props,
+        ref,
+    ) {
+        return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    });
+
+    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+    const register = async () => {
         const hashedPassword = hashSync(password, genSaltSync(10));
         userService.registerUser({
             felhasznalonev: username, 
@@ -24,11 +36,23 @@ const Register = () => {
             jelszo: hashedPassword,
             jogosultsag:Jogosultsag.Kutato
         });
+        setSnackbarOpen(true);
+        await delay(2000);
         window.location.href = '/login';
     };
 
     return (
         <div id="registerMain">
+            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}>
+                <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
+                    Sikeres regisztráció!
+                </Alert>
+            </Snackbar>
+            <Snackbar open={failedSnacbarOpen} autoHideDuration={3000} onClose={() => setFailedSnackbarOpen(false)}>
+                <Alert onClose={() => setFailedSnackbarOpen(false)} severity="error" sx={{ width: '100%' }}>
+                    Sikertelen regisztráció!
+                </Alert>
+            </Snackbar>
             <h1>Register</h1>
             <div id='formDiv'>
                 <label htmlFor="Username">Felhasznalonév</label>

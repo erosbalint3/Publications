@@ -296,13 +296,13 @@ const Kozlemenyek = () => {
                     <Select multiple value={selectedKozlemeny?.szerzoi} sx={{width: 200, color: "black"}} onChange={(event) => {
                         setSelectedKozlemeny({ ...selectedKozlemeny, szerzoi: event.target.value as string[] } as Kozlemeny);
                     }}>
-                            {szerzok.map((szerzo) => (
-                                <MenuItem 
-                                    key={szerzo.nev}
-                                    value={szerzo.nev}
-                                >{szerzo.nev}</MenuItem>
-                            ))}
-                        </Select>
+                        {szerzok.map((szerzo) => (
+                            <MenuItem 
+                                key={szerzo.nev}
+                                value={szerzo.nev}
+                            >{szerzo.nev}</MenuItem>
+                        ))}
+                    </Select>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setUpdateDialogOpen(false)}>Cancel</Button>
