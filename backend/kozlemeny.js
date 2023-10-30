@@ -58,7 +58,7 @@ module.exports = {
     },
     addKozlemeny: (kozlemeny, callback) => {
         console.log(kozlemeny);
-        connection.query('INSERT INTO Kozlemeny SET id=?, cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=?', [kozlemeny.id, kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev], (err, rows) => {
+        connection.query('INSERT INTO Kozlemeny SET id=?, cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=?, publikacioTipusa=?, publikacioFajlNev=?, publikacioFajlPath=?', [kozlemeny.id, kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev, kozlemeny.publikacioTipusa, kozlemeny.publikacioFajlNev, kozlemeny.publikacioFajlPath], (err, rows) => {
             if (err) throw err;
             return callback(err, rows);
         });

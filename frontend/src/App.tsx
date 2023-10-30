@@ -50,13 +50,14 @@ function App() {
             <Link to="/folyoiratok">Folyóiratok</Link>
             {user?.jogosultsag == "ADMIN" && <Link to='/jovahagyas'>Közlemények jóváhagyása</Link>}
             {user?.jogosultsag == "ADMIN" && <Link to='/osszesProfil'>Összes felhasználó</Link>}
-            <Link to="#" onClick={async () => {
-              ReactSession.set("isLoggedIn", false);
-              ReactSession.set("user", null); 
-              setSnackbarOpen(true);
-              await delay(2000);
-              window.location.href = '/login';
-            }}>Kijelentkezés</Link>
+            {user && <Link to="#" onClick={async () => {
+                ReactSession.set("isLoggedIn", false);
+                ReactSession.set("user", null); 
+                setSnackbarOpen(true);
+                await delay(2000);
+                window.location.href = '/login';
+              }}>Kijelentkezés</Link>
+            }
           </nav>
 
           <Routes>

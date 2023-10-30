@@ -24,7 +24,7 @@ const Folyoiratok = () => {
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [selectedFolyoirat, setSelectedFolyoirat] = useState<Folyoirat>();
-    const [addData, setAddData] = useState<Folyoirat>({ id: '', nev: '', szerkeszto: user.felhaszanlonev, nyelv: '', minosites: 0, kiado: '' });
+    const [addData, setAddData] = useState<Folyoirat>({ id: '', nev: '', szerkeszto: user?.felhasznalonev, nyelv: '', minosites: 0, kiado: '' });
     let startIndex = 0;
 
     

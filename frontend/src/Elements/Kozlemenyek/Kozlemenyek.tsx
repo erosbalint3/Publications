@@ -14,9 +14,10 @@ import DialogContentText from '@mui/material/DialogContentText';
 import { ReactSession } from 'react-client-session';
 import { Kiado } from '../../Models/Kiado';
 import KiadoService from '../../Services/kiadoService';
-import { alignProperty } from '@mui/material/styles/cssUtils';
 import { Folyoirat } from '../../Models/Folyoirat';
 import FolyoiratService from '../../Services/folyoiratService';
+import { useFilePicker } from 'use-file-picker';
+import { Document, Page, pdfjs } from 'react-pdf';
 
 const kozlemenyService = new KozlemenyService();
 const szerzoService = new SzerzoService();
@@ -35,15 +36,24 @@ const Kozlemenyek = () => {
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [selectedKozlemeny, setSelectedKozlemeny] = useState<Kozlemeny>();
-    const [addData, setAddData] = useState<Kozlemeny>({id: '', cim: '', folyoirat_azon: '', kiadas_eve: 0, szerzoi: [], felhasznalonev: ''});
+    const [addData, setAddData] = useState<Kozlemeny>({id: '', cim: '', folyoirat_azon: '', kiadas_eve: 0, szerzoi: [], felhasznalonev: '', publikacioTipusa: 'igen', publikacioFajlNev: '', publikacioFajlPath: ''});
     const [kiadok, setKiadok] = useState<Kiado[]>([]);
     const [filterByKiadoDialogOpen, setFilterByKiadoDialogOpen] = useState(false);
     const [selectedKiadok, setSelectedKiadok] = useState<string[]>([]);
     const [kiadasEveGroup, setKiadasEveGroup] = useState<number[]>([]);
     const [filtered, setFiltered] = useState<boolean>(false);
+    const [pdfString, setPdfString] = useState('');
+    const [documentDialogOpen, setDocumentDialogOpen] = useState(false);
+    const [numPages, setNumPages] = useState(0);
 
+    const { plainFiles, filesContent, openFilePicker } = useFilePicker({ accept: '.pdf' });
+    
     const user = ReactSession.get('user');
     const isLoggedIn = ReactSession.get('isLoggedIn');
+
+    useEffect(() => { 
+        pdfjs.GlobalWorkerOptions.workerSrc =`https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.js`;
+    }, []);
 
     let startIndex = 0;
 
@@ -63,8 +73,6 @@ const Kozlemenyek = () => {
         setUpdateDialogOpen(false);
         window.location.reload();
     };
-
-    
 
     useEffect(() => {
          kozlemenyService.getAllKozlemeny().then((kozlemenyek) => {
@@ -92,7 +100,6 @@ const Kozlemenyek = () => {
             window.location.href = '/login';
             startIndex++;
         }
-        console.log(kozlemenyek);
     }, []);
 
     const getFolyoiratNevById = (id: string) => {
@@ -124,6 +131,15 @@ const Kozlemenyek = () => {
         setKiadasEveGroup(array);
 
     }, [kozlemenyek]);
+
+    useEffect(() => {
+        const blob = new Blob([plainFiles[0]], {type: '.pdf'});
+        let reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onload = function() {
+            setAddData({...addData, publikacioFajlPath: reader.result as string, publikacioFajlNev: plainFiles[0]?.name});
+        };
+    }, [filesContent]);
 
     const handleFilterByKiado = async () => {
         const kiadoSelect = document.getElementById('kiadoSelect') as HTMLSelectElement;
@@ -171,8 +187,19 @@ const Kozlemenyek = () => {
                 return params?.value?.join(', ');
             }            
         },
+        {field: 'publikacioTipusa', headerName: 'Publikáció típusa', width: 200},
+        {field: 'publikacioFajlPath', headerName: 'Publikáció megnyitása', width: 200, renderCell: (params) => {
+                return (
+                    <div>
+                        <button onClick={() => {
+                            setPdfString(params.value);
+                            setDocumentDialogOpen(true);
+                        }}>Open</button>
+                    </div>
+                );
+            }
+        }
     ];
-    
 
     return (
         <div id='kozlemenyekMain'>
@@ -246,6 +273,9 @@ const Kozlemenyek = () => {
                             >{szerzo.nev}</MenuItem>
                         ))}
                     </Select>
+                    <div>
+                        <button onClick = {() => openFilePicker()}>Publikáció feltöltése</button>
+                    </div>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
@@ -311,30 +341,38 @@ const Kozlemenyek = () => {
             </Dialog>
             <h1 style={{textAlign: 'left', marginLeft: '5px'}}>Saját közlemények évenkénti statisztikája</h1>
             {kiadasEveGroup.length > 0 &&<BarChart
-                        disableAxisListener
-                        xAxis={[
-                            {
-                                id: 'kiadasEvei',
-                                data: kozlemenyek.filter((value, index, self) => self.indexOf(value) === index).filter((kozlemeny) => kozlemeny.felhasznalonev == user?.felhasznalonev).map((kozlemeny) => kozlemeny.kiadas_eve).sort(),
-                                scaleType: 'band',
+                    disableAxisListener
+                    xAxis={[
+                        {
+                            id: 'kiadasEvei',
+                            data: kozlemenyek.filter((value, index, self) => self.indexOf(value) === index).filter((kozlemeny) => kozlemeny.felhasznalonev == user?.felhasznalonev).map((kozlemeny) => kozlemeny.kiadas_eve),
+                            scaleType: 'band',
+                        }
+                    ]}
+                    yAxis={[
+                        {
+                            valueFormatter: (params) => {
+                                return params.toFixed(0);
                             }
-                        ]}
-                        yAxis={[
-                            {
-                                valueFormatter: (params) => {
-                                    return params.toFixed(0);
-                                }
-                            }
-                        ]}
-                        series={[
-                            {
-                                data: kiadasEveGroup
-                            }
-                        ]}
-                        height={300}
-                        
-                    />
-                }
+                        }
+                    ]}
+                    series={[
+                        {
+                            data: kiadasEveGroup
+                        }
+                    ]}
+                    height={300}
+                    
+                />
+            }
+            <Dialog open={documentDialogOpen} onClose={() => setDocumentDialogOpen(false)}>
+                <Document file={pdfString} onLoadSuccess={({ numPages }) => setNumPages(numPages)}>
+                    {Array.apply(null, Array(numPages)).map((x, i) => i + 1).map((page) => (
+                        <Page width={1850} scale={0.3} pageNumber={page} />
+                    
+                    ))}
+                </Document>
+            </Dialog>
         </div>
     )
 };

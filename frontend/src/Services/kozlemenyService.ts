@@ -3,10 +3,12 @@ import { Kozlemeny } from "../Models/Kozlemeny";
 class KozlemenyService {
     async addNewKozlemeny(kozlemeny: Kozlemeny) {
         const headers = {"Content-Type": "application/json", "Allow-Origin-Access-Control": "*"};
-        const response = await fetch(`http://localhost:3001/kozlemeny/?kozlemeny=${encodeURIComponent(JSON.stringify(kozlemeny))}`, {
+        const requestOption = {
             method: 'POST',
-            headers: headers
-        });
+            headers: headers,
+            body: JSON.stringify(kozlemeny)
+        };
+        const response = await fetch(`http://localhost:3001/kozlemeny/`, requestOption);
         return await response.json();
     };
 

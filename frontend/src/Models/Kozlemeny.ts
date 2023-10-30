@@ -5,4 +5,7 @@ export interface Kozlemeny {
     kiadas_eve: number;
     felhasznalonev?: string;
     szerzoi?: string[];
+    publikacioTipusa: string;
+    publikacioFajlNev: string;
+    publikacioFajlPath: string;
 }

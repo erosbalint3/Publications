@@ -7,7 +7,11 @@ const kiado = require('./kiado.js');
 const folyoirat = require('./folyoirat.js');
 const szerzo = require('./szerzo.js');
 
+const bodyParser = require('body-parser');
+
 const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({ limit: '500mb' }));
 const port = 3001;
 
 app.use(cors({
@@ -66,8 +70,7 @@ app.get('/kozlemeny/felhasznalonev/', (req, res) => {
     });
 });
 app.post('/kozlemeny/', (req, res) => {
-    req.query.kozlemeny = JSON.parse(req.query.kozlemeny);
-    kozlemeny.addKozlemeny(req.query.kozlemeny, (err, rows) => {
+    kozlemeny.addKozlemeny(req.body, (err, rows) => {
         res.send(rows); 
     });
 });
