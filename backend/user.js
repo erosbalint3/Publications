@@ -32,7 +32,6 @@ module.exports = {
         };
 
         connection.query('INSERT INTO Felhasznalo SET ?', payload, (err, rows, fields) => {
-            if (err) throw err;
             return callback(err, rows);
         });
     },
@@ -48,19 +47,16 @@ module.exports = {
         };
 
         connection.query('UPDATE Felhasznalo SET ? WHERE felhasznalonev=?', [payload, user.felhasznalonev], (err, rows, fields) => {
-            if (err) throw err;
             return callback(err, rows);
         });
     },
     deleteUser: (user, callback) => {
         connection.query('DELETE FROM Felhasznalo WHERE felhasznalonev=?', [user.felhasznalonev], (err, rows, fields) => {
-            if (err) throw err;
             return callback(err, rows);
         });
     },
     getAllUser: (callback) => {
         connection.query('SELECT * FROM Felhasznalo', (err, rows) => {
-            if (err) throw err;
             return callback(err, rows);
         });
     }

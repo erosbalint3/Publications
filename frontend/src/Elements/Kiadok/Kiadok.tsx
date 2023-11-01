@@ -8,6 +8,9 @@ import KiadoService from '../../Services/kiadoService';
 import './Kiadok.css';
 import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText } from "@mui/material";
 import { ReactSession } from "react-client-session";
+import { Snackbar, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import { Error } from '../../Models/Error';
 
 const kiadoService = new KiadoService();
 
@@ -17,11 +20,20 @@ const Kiadok = () => {
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [selectedKiado, setSelectedKiado] = useState<Kiado>();
     const [addData, setAddData] = useState<Kiado>({ nev: '', telefonszam: '', szekhely: '', szerkeszto: '' });
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarError, setSnackbarError] = useState('');
 
     const user = ReactSession.get('user');
     const isLoggedIn = ReactSession.get('isLoggedIn');
 
     let startIndex = 0;
+
+    const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+        props,
+        ref,
+    ) {
+        return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    });
 
     const columns: GridColDef[] = [
         {
@@ -54,13 +66,18 @@ const Kiadok = () => {
         }
     }, []);
 
-    const deleteKiado = (row: Kiado) => {
+    const deleteKiado = async (row: Kiado) => {
         if (!isLoggedIn || user.jogosultsag != "ADMIN") {
             alert('You are not logged in or you are not an admin!');
             return;
         }
-        kiadoService.deleteKiado(row);
-        window.location.reload();
+        const response = await kiadoService.deleteKiado(row);
+        if ((response as unknown as Error)?.code == "ER_ROW_IS_REFERENCED_2") {
+            setSnackbarError('Cannot delete referenced row!');
+            setSnackbarOpen(true);
+        } else {
+            window.location.reload();
+        }
     }
 
     const handleOpen = (params: any) => {
@@ -98,6 +115,11 @@ const Kiadok = () => {
 
     return (
         <div id='kiadokMain'>
+            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}>
+                <Alert onClose={() => setSnackbarOpen(false)} severity="error" sx={{ width: '100%' }}>
+                    {snackbarError}
+                </Alert>
+            </Snackbar>
             <div id='ButtonsGroup'>
                 <button onClick={() => handleAddDialogOpen()}>Add new</button>
             </div>

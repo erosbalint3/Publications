@@ -1,3 +1,5 @@
+import { Folyoirat } from "../Models/Folyoirat";
+
 class FolyoiratService {
     async addNewFolyoirat(folyoirat: any) {
         const headers = {"Content-Type": "application/json", "Allow-Origin-Access-Control": "*"};
@@ -17,7 +19,7 @@ class FolyoiratService {
         return await response.json();
     }
 
-    async deleteFolyoirat(folyoirat: any) {
+    async deleteFolyoirat(folyoirat: any): Promise<Error | Folyoirat> {
         const headers = {"Content-Type": "application/json", "Allow-Origin-Access-Control": "*"};
         const response = await fetch(`http://localhost:3001/folyoirat/?folyoirat=${encodeURIComponent(JSON.stringify(folyoirat))}`, {
             method: 'DELETE',

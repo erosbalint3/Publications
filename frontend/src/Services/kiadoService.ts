@@ -19,7 +19,7 @@ class KiadoService {
         return await response.json();
     }
 
-    async deleteKiado(kiado: any) {
+    async deleteKiado(kiado: any): Promise<Error | Kiado> {
         const headers = {"Content-Type": "application/json", "Allow-Origin-Access-Control": "*"};
         const response = await fetch(`http://localhost:3001/kiado/?kiado=${encodeURIComponent(JSON.stringify(kiado))}`, {
             method: 'DELETE',

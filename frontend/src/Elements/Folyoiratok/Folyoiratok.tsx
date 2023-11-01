@@ -11,6 +11,9 @@ import FolyoiratService from "../../Services/folyoiratService";
 import KiadoService from "../../Services/kiadoService";
 import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText, Alert, Stack } from "@mui/material";
 import { ReactSession } from "react-client-session";
+import { Snackbar, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import { Error } from '../../Models/Error';
 
 const folyoiratService = new FolyoiratService();
 const kiadoService = new KiadoService();
@@ -26,8 +29,15 @@ const Folyoiratok = () => {
     const [selectedFolyoirat, setSelectedFolyoirat] = useState<Folyoirat>();
     const [addData, setAddData] = useState<Folyoirat>({ id: '', nev: '', szerkeszto: user?.felhasznalonev, nyelv: '', minosites: 0, kiado: '' });
     let startIndex = 0;
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarError, setSnackbarError] = useState('');
 
-    
+    const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+        props,
+        ref,
+    ) {
+        return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    });
 
     const columns: GridColDef[] = [
         {
@@ -62,13 +72,18 @@ const Folyoiratok = () => {
         }
     }, []);
 
-    const deleteFolyoirat = (row: Folyoirat) => {
+    const deleteFolyoirat = async (row: Folyoirat) => {
         if (!isLoggedIn || user.jogosultsag != "ADMIN") {
             alert('You are not logged in or you are not an admin!');
             return;
         }
-        folyoiratService.deleteFolyoirat(row);
-        window.location.reload();
+        const response = await folyoiratService.deleteFolyoirat(row);
+        if ((response as unknown as Error)?.code == "ER_ROW_IS_REFERENCED_2") {
+            setSnackbarError('Cannot delete referenced row!');
+            setSnackbarOpen(true);
+        } else {
+            window.location.reload();
+        }
     }
 
     const handleOpen = (params: any) => {
@@ -95,13 +110,23 @@ const Folyoiratok = () => {
     };
 
     const handleSave = () => {
-        folyoiratService.saveFolyoirat(selectedFolyoirat!);
+        const response = folyoiratService.saveFolyoirat(selectedFolyoirat!);
         setUpdateDialogOpen(false);
+        if ((response as unknown as Error)?.code == "ER_ROW_IS_REFERENCED_2") {
+            setSnackbarError('Cannot delete referenced row!');
+            setSnackbarOpen(true);
+        } else {
+            window.location.reload();
+        }
         window.location.reload();
     };
-
     
     return <div id="folyoiratokMain">
+        <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}>
+            <Alert onClose={() => setSnackbarOpen(false)} severity="error" sx={{ width: '100%' }}>
+                {snackbarError}
+            </Alert>
+        </Snackbar>
         <div id='ButtonsGroup'>
             <button onClick={() => handleAddDialogOpen()}>Add new</button>
         </div>

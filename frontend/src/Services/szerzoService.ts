@@ -1,3 +1,4 @@
+import { Error } from "../Models/Error";
 import { Kozlemeny } from "../Models/Kozlemeny";
 import { Szerzo } from "../Models/Szerzo";
 
@@ -29,7 +30,7 @@ class SzerzoService {
         return await response.json();
     }
 
-    async deleteSzerzo(szerzo: any) {
+    async deleteSzerzo(szerzo: any): Promise<Szerzo | Error> {
         const headers = {"Content-Type": "application/json", "Allow-Origin-Access-Control": "*"};
         const response = await fetch(`http://localhost:3001/szerzo/?szerzo=${encodeURIComponent(JSON.stringify(szerzo))}`, {
             method: 'DELETE',

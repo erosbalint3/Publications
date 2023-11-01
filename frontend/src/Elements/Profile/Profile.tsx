@@ -5,6 +5,8 @@ import UserService from "../../Services/userService";
 import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText } from "@mui/material";
 import { Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import { User } from "../../Models/User";
+import { Error } from "../../Models/Error";
 
 const userService = new UserService();
 
@@ -21,6 +23,8 @@ const Profile = () => {
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [updatePasswordDialogOpen, setUpdatePasswordDialogOpen] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarErrorOpen, setSnackbarErrorOpen] = useState(false);
+    const [snackbarError, setSnackbarError] = useState('');
 
     let startIndex = 0;
 
@@ -43,6 +47,16 @@ const Profile = () => {
         }
     }, []);
 
+    const deleteProfile = async (row: User) => {
+        const response = await userService.deleteUser(row);
+        if ((response as unknown as Error)?.code == "ER_ROW_IS_REFERENCED_2") {
+            setSnackbarError('Cannot delete referenced row!');
+            setSnackbarErrorOpen(true);
+        } else {
+            window.location.reload();
+        }
+    };
+
     const handleSave = () => {
         userService.saveUser({...user, keresztnev: firstName, vezeteknev: lastName, email: email});
         window.location.reload();
@@ -58,14 +72,14 @@ const Profile = () => {
 
     return (
         <div id="profileMain">
-            <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}>
-                <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%', zIndex: 100000 }}>
-                    Login successful!
+            <Snackbar open={snackbarErrorOpen} autoHideDuration={3000} onClose={() => setSnackbarErrorOpen(false)}>
+                <Alert onClose={() => setSnackbarErrorOpen(false)} severity="error" sx={{ width: '100%', zIndex: 100000 }}>
+                    {snackbarError}
                 </Alert>
             </Snackbar>
             <div id="headerButtons">
                 <button onClick={() => setUpdateDialogOpen(true)}>Update profile</button>
-                <button>Delete profile</button>
+                <button onClick={() => deleteProfile(user)}>Delete profile</button>
             </div>
             <div id="profileInfo">
                 <div id="profilePicture">

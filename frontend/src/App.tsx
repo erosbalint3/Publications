@@ -42,12 +42,12 @@ function App() {
           </Snackbar>
           <nav id='navBar'>
             <Link to="/">Profile</Link>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
+            {!user && <Link to="/login">Login</Link>}
+            {!user && <Link to="/register">Register</Link>}
             <Link to="/kozlemenyek">Közlemények</Link>   
-            <Link to="/szerzok">Szerzők</Link>    
-            <Link to="/kiadok">Kiadók</Link>
-            <Link to="/folyoiratok">Folyóiratok</Link>
+            {user?.jogosultsag != 'SZERZO' && <Link to="/szerzok">Szerzők</Link>}    
+            {user?.jogosultsag != 'SZERZO' && <Link to="/kiadok">Kiadók</Link>}
+            {user?.jogosultsag != 'SZERZO' && <Link to="/folyoiratok">Folyóiratok</Link>}
             {user?.jogosultsag == "ADMIN" && <Link to='/jovahagyas'>Közlemények jóváhagyása</Link>}
             {user?.jogosultsag == "ADMIN" && <Link to='/osszesProfil'>Összes felhasználó</Link>}
             {user && <Link to="#" onClick={async () => {
