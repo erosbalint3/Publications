@@ -34,14 +34,17 @@ module.exports = {
         });
     },
     updateKozlemeny: (kozlemeny, callback) => {
-        kozlemeny.szerzoi.forEach(element => {
-            connection.query('UPDATE szerzoi SET szerzo_id=? WHERE kozl_id=?', [element, kozlemeny.id], (err, rows) => {
-                if (err) throw err;
-            }); 
+        connection.query('SET FOREIGN_KEY_CHECKS=0', (err, rows) => {
+            kozlemeny.szerzoi.forEach(element => {
+                connection.query('UPDATE szerzoi SET szerzo_id=? WHERE kozl_id=?', [element, kozlemeny.id], (err, rows) => {
+                    if (err) throw err;
+                }); 
+            });
         });
-
-        connection.query('UPDATE Kozlemeny SET cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=? WHERE id=?', [kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev, kozlemeny.id], (err, rows) => {
-            return callback(err, rows);
+        connection.query('SET FOREIGN_KEY_CHECKS=1', (err, rows) => {
+            connection.query('UPDATE Kozlemeny SET cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=?, publikacioTipusa=?, publikacioFajlPath=? WHERE id=?', [kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev, kozlemeny.publikacioTipusa, kozlemeny.publikacioFajlPath, kozlemeny.id], (err, rows) => {
+                return callback(err, rows);
+            });
         });
     },
     deleteKozlemeny: (kozlemeny, callback) => {
@@ -78,6 +81,11 @@ module.exports = {
     },
     getKozlemenyekByKiadoNev(kiado_nev, callback) {
         connection.query('SELECT Kozlemeny.cim, Kozlemeny.elfogadva, Kozlemeny.felhasznalonev, Kozlemeny.folyoirat_azon, Kozlemeny.id, Kozlemeny.kiadas_eve FROM Kozlemeny, Folyoirat WHERE Kozlemeny.folyoirat_azon = Folyoirat.id AND Folyoirat.kiado=?', [kiado_nev], (err, rows) => {
+            return callback(err, rows);
+        });
+    },
+    getKozlemenyByTipus(felhasznalonev, tipus, callback) {
+        connection.query('SELECT * FROM Kozlemeny WHERE felhasznalonev=? AND publikacioTipusa=?', [felhasznalonev, tipus], (err, rows) => {
             return callback(err, rows);
         });
     }

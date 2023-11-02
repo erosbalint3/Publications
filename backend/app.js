@@ -56,6 +56,13 @@ app.get('/kozlemeny', (req, res) => {
         res.send(rows);
     });
 });
+app.get('/kozlemeny/tipus/', (req, res) => {
+    req.query.tipus = JSON.parse(req.query.tipus);
+    kozlemeny.getKozlemenyByTipus(req.query.tipus.felhasznalonev, req.query.tipus.tipus, (err, rows) => {
+        if (err) res.send(err);
+        res.send(rows);
+    });
+});
 app.get('/kozlemeny/', (req, res) => {
     kozlemeny.getKozlemenyById(req.query.id, (err, rows) => {
         if (err) res.send(err);
@@ -87,8 +94,7 @@ app.post('/kozlemeny/', (req, res) => {
     });
 });
 app.put('/kozlemeny/', (req, res) => {
-    req.query.kozlemeny = JSON.parse(req.query.kozlemeny);
-    kozlemeny.updateKozlemeny(req.query.kozlemeny, (err, rows) => {
+    kozlemeny.updateKozlemeny(req.body, (err, rows) => {
         if (err) res.send(err);
         res.send(rows);
     });

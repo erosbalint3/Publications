@@ -36,15 +36,19 @@ const Kozlemenyek = () => {
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [selectedKozlemeny, setSelectedKozlemeny] = useState<Kozlemeny>();
-    const [addData, setAddData] = useState<Kozlemeny>({id: '', cim: '', folyoirat_azon: '', kiadas_eve: 0, szerzoi: [], felhasznalonev: '', publikacioTipusa: 'igen', publikacioFajlNev: '', publikacioFajlPath: ''});
+    const [addData, setAddData] = useState<Kozlemeny>({id: '', cim: '', folyoirat_azon: '', kiadas_eve: 0, szerzoi: [], felhasznalonev: '', publikacioTipusa: '', publikacioFajlNev: '', publikacioFajlPath: ''});
     const [kiadok, setKiadok] = useState<Kiado[]>([]);
     const [filterByKiadoDialogOpen, setFilterByKiadoDialogOpen] = useState(false);
+    const [filterByTipusDialogOpen, setFilterByTipusDialogOpen] = useState(false);
     const [selectedKiadok, setSelectedKiadok] = useState<string[]>([]);
     const [kiadasEveGroup, setKiadasEveGroup] = useState<number[]>([]);
     const [filtered, setFiltered] = useState<boolean>(false);
     const [pdfString, setPdfString] = useState('');
     const [documentDialogOpen, setDocumentDialogOpen] = useState(false);
     const [numPages, setNumPages] = useState(0);
+    const [selectedTipus, setSelectedTipus] = useState<string>();
+
+    const types = ['Journal', 'Magazine', 'Report', 'Book', 'Newspaper', 'Thesis', 'Bibliography', 'Other'];
 
     const { plainFiles, filesContent, openFilePicker } = useFilePicker({ accept: '.pdf' });
     
@@ -71,7 +75,7 @@ const Kozlemenyek = () => {
     const handleSave = () => {
         kozlemenyService.saveKozlemeny(selectedKozlemeny!);
         setUpdateDialogOpen(false);
-        window.location.reload();
+        //window.location.reload();
     };
 
     useEffect(() => {
@@ -160,6 +164,25 @@ const Kozlemenyek = () => {
         setFilterByKiadoDialogOpen(false);
     };
 
+    const handleFilterByTipus = async () => {
+        const tipusSelect = document.getElementById('tipusSelect') as HTMLSelectElement;
+        const tipus = tipusSelect.value;
+        kozlemenyService.getKozlemenyByTipus(user.felhasznalonev, selectedTipus!).then((kozl: Kozlemeny[]) => {
+            setKozlemenyek(kozl);
+            kozlemenyek.map(async (kozlElement: Kozlemeny) => {
+                const folyoirat = await folyoiratService.getFolyoiratByKiado(tipus);
+                if (kozlElement.folyoirat_azon == folyoirat.id) {
+                    szerzoService.getSzerzoByKozlemeny(kozlElement.id).then((szerzoData) => {
+                        kozlElement.szerzoi = szerzoData.map((szerzo) => szerzo.nev);
+                        setKozlemenyek(oldArray => [...oldArray, kozlElement]);
+                    });
+                }
+            });
+        });
+        
+        setFilterByTipusDialogOpen(false);
+    };
+
     const columns: GridColDef[] = [
         {
             field: 'action', 
@@ -187,6 +210,15 @@ const Kozlemenyek = () => {
                 return params?.value?.join(', ');
             }            
         },
+        {
+            field: 'szerzoCount',
+            headerName: 'Szerzők száma',
+            width: 200,
+            valueGetter: (params) => {
+                return params?.row?.szerzoi?.length;
+            },
+            type: 'number'
+        },
         {field: 'publikacioTipusa', headerName: 'Publikáció típusa', width: 200},
         {field: 'publikacioFajlPath', headerName: 'Publikáció megnyitása', width: 200, renderCell: (params) => {
                 return (
@@ -206,10 +238,10 @@ const Kozlemenyek = () => {
             <div id='ButtonsGroup'>
                 <button onClick={() => setAddDialogOpen(true)}>Add new</button>
                 <button onClick={() => setFilterByKiadoDialogOpen(true)}>Filter by Kiado</button>
+                <button onClick={() => setFilterByTipusDialogOpen(true)}>Filter by Tipus</button>
             </div>
             <div>
-                <DataGrid rows={kozlemenyek} columns={columns}/>
-                
+                <DataGrid rows={kozlemenyek} columns={columns}/>            
             </div>
             <Dialog open={filterByKiadoDialogOpen} onClose={() => setFilterByKiadoDialogOpen(false)}>
                 <DialogContent>
@@ -224,6 +256,21 @@ const Kozlemenyek = () => {
                         onChange={(event, value) => setSelectedKiadok(value)}
                     />
                     <Button onClick={() => handleFilterByKiado()} sx={{ mt: 5}}>Filter</Button>
+                    <Button onClick={() => setFilterByKiadoDialogOpen(false)} sx={{ mt: 5}}>Cancel</Button>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={filterByTipusDialogOpen} onClose={() => setFilterByTipusDialogOpen(false)}>
+                <DialogContent>
+                    <Autocomplete 
+                        id='tipusSelect'
+                        options={types}
+                        value={selectedTipus}
+                        getOptionLabel={(option) => option}
+                        sx={{width: 300}}
+                        renderInput={(params) => <TextField {...params} label='Típus' variant='standard'/>}
+                        onChange={(event, value) => setSelectedTipus(value || '')}
+                    />
+                    <Button onClick={() => handleFilterByTipus()} sx={{ mt: 5}}>Filter</Button>
                     <Button onClick={() => setFilterByKiadoDialogOpen(false)} sx={{ mt: 5}}>Cancel</Button>
                 </DialogContent>
             </Dialog>
@@ -264,6 +311,15 @@ const Kozlemenyek = () => {
                         onChange={(event) => {
                             setAddData({ ...addData, kiadas_eve: parseInt(event.target.value) });
                         }}
+                    />
+                    <Autocomplete 
+                        id='tipusSelect'
+                        options={types}
+                        value={addData?.publikacioTipusa}
+                        getOptionLabel={(option) => option}
+                        sx={{width: 300}}
+                        renderInput={(params) => <TextField {...params} label='Típus' variant='standard'/>}
+                        onChange={(event, value) => setAddData({ ...addData, publikacioTipusa: value || ''})}
                     />
                     <Select multiple value={addData?.szerzoi} sx={{width: 200, color: "black"}} onChange={(params) => setAddData({ ...addData, szerzoi: params.target.value as string[]})}>
                         {szerzok.map((szerzo) => (
@@ -309,6 +365,15 @@ const Kozlemenyek = () => {
                             >{folyoirat.nev}</MenuItem>
                         ))}
                     </Select>
+                    <Autocomplete 
+                        id='tipusSelect'
+                        options={types}
+                        value={selectedKozlemeny?.publikacioTipusa}
+                        getOptionLabel={(option) => option}
+                        sx={{width: 300}}
+                        renderInput={(params) => <TextField {...params} label='Típus' variant='standard'/>}
+                        onChange={(event, value) => setSelectedKozlemeny({ ...selectedKozlemeny, publikacioTipusa: value || ''} as Kozlemeny)}
+                    />
                     <TextField
                         autoFocus
                         margin="dense"
@@ -329,7 +394,7 @@ const Kozlemenyek = () => {
                         {szerzok.map((szerzo) => (
                             <MenuItem 
                                 key={szerzo.nev}
-                                value={szerzo.nev}
+                                value={szerzo.id}
                             >{szerzo.nev}</MenuItem>
                         ))}
                     </Select>
