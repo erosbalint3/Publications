@@ -92,17 +92,17 @@ const Login = () => {
                 <ToggleButton value={true}>Szerző</ToggleButton>
             </ToggleButtonGroup>
             {!szerzoMode && <form onSubmit={handleSubmit}>
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="email">Felhasználónév</label>
                     <input type="username" id="username" onChange={event => setUsername(event.target.value)} />
-                    <label htmlFor="password">Password</label>
+                    <label htmlFor="password">Jelszó</label>
                     <input type="password" id="password" onChange={event => setPassword(event.target.value)} />
-                    <button type="submit">Login</button>
+                    <button type="submit">Bejelentkezés</button>
                 </form>
             }
             {szerzoMode && <form onSubmit={handleSubmit}>
                     <label htmlFor="nev">Név</label>
                     <input type="text" id="nev" onChange={event => setSzerzoNev(event.target.value)} />
-                    <button type="submit">Login</button>
+                    <button type="submit">Bejelentkezés szerzőként</button>
                 </form>
             }
         </div>

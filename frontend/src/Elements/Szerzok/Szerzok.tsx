@@ -8,9 +8,10 @@ import SzerzoService from "../../Services/szerzoService";
 import './Szerzok.css';
 import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText } from "@mui/material";
 import { ReactSession } from "react-client-session";
-import { Snackbar, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Snackbar, ToggleButton, ToggleButtonGroup, createTheme, ThemeProvider } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { Error } from '../../Models/Error';
+import { huHU } from '@mui/material/locale';
 
 const szerzoService = new SzerzoService();
 
@@ -27,6 +28,8 @@ const Szerzok = () => {
     const isLoggedIn = ReactSession.get('isLoggedIn');
 
     let startIndex = 0;
+
+    const theme = createTheme({}, huHU);
 
     const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
         props,
@@ -104,7 +107,9 @@ const Szerzok = () => {
                 <button onClick={() => setAddDialogOpen(true)}>Add new</button>
             </div>
             <div>
-                <DataGrid rows={szerzok} columns={columns} editMode='row' getRowId={(row) => row.nev}/>
+                <ThemeProvider theme={theme}>
+                    <DataGrid rows={szerzok} columns={columns} editMode='row' getRowId={(row) => row.nev}/>
+                </ThemeProvider>
             </div>
             <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
                 <DialogTitle>Subscribe</DialogTitle>

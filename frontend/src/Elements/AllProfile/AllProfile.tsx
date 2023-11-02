@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, huHU } from '@mui/x-data-grid';
 import { GridRowsProp } from '@mui/x-data-grid';
 import { GridColDef } from '@mui/x-data-grid';
 import { User } from '../../Models/User';
 import UserService from '../../Services/userService';
 import './AllProfile.css';
-import { Snackbar, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Snackbar, ThemeProvider, ToggleButton, ToggleButtonGroup, createTheme } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { Error } from '../../Models/Error';
 
@@ -19,6 +19,8 @@ const AllProfile = () => {
     useEffect(() => {
         userService.getAllUser().then(data => setUsers(data as User[])).catch((error) => console.log(error));
     }, []);
+
+    const theme = createTheme({}, huHU);
 
     const deleteProfile = async (row: User) => {
         const response = await userService.deleteUser(row);
@@ -40,13 +42,13 @@ const AllProfile = () => {
     const columns: GridColDef[] = [
         {
             field: 'action', 
-            headerName: 'Action',
+            headerName: 'Funkciók',
             width: 200, 
             editable: false,
             renderCell: (params) => {
                 return (
                     <div>
-                        <button onClick={() => deleteProfile(params.row)!}>Delete</button>
+                        <button onClick={() => deleteProfile(params.row)!}>Törlés</button>
                     </div>
                 )
             }
@@ -66,7 +68,9 @@ const AllProfile = () => {
                 </Alert>
             </Snackbar>
             <div id='mainTable'>
-                <DataGrid rows={users} columns={columns} editMode='row' getRowId={(row) => row.felhasznalonev}/>
+                <ThemeProvider theme={theme}>
+                    <DataGrid rows={users} columns={columns} editMode='row' getRowId={(row) => row.felhasznalonev}/>
+                </ThemeProvider>
             </div>
         </div>
     );

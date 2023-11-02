@@ -4,7 +4,7 @@ import { GridColDef } from '@mui/x-data-grid';
 import { Kozlemeny } from '../../Models/Kozlemeny';
 import { v4 as uuidv4 } from 'uuid';
 import KozlemenyService from '../../Services/kozlemenyService';
-import { MenuItem, Select, TextField, Dialog, DialogTitle, DialogContent, Button, Autocomplete } from '@mui/material';
+import { MenuItem, Select, TextField, Dialog, DialogTitle, DialogContent, Button, Autocomplete, createTheme, ThemeProvider } from '@mui/material';
 import { BarChart } from '@mui/x-charts/BarChart';
 import './Kozlemenyek.css';
 import SzerzoService from '../../Services/szerzoService';
@@ -18,11 +18,14 @@ import { Folyoirat } from '../../Models/Folyoirat';
 import FolyoiratService from '../../Services/folyoiratService';
 import { useFilePicker } from 'use-file-picker';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { huHU } from '@mui/material/locale';
 
 const kozlemenyService = new KozlemenyService();
 const szerzoService = new SzerzoService();
 const kiadoService = new KiadoService();
 const folyoiratService = new FolyoiratService();
+
+const theme = createTheme({}, huHU);
 
 const deleteKozlemeny = (kozlemeny: Kozlemeny) => {
     kozlemenyService.deleteKozlemeny(kozlemeny);
@@ -191,8 +194,8 @@ const Kozlemenyek = () => {
             renderCell: (params) => {
                 return (
                     <div>
-                        <button onClick={() => deleteKozlemeny(params.row)}>Delete</button>
-                        <button onClick={() => handleOpen(params)}>Update</button>
+                        <button onClick={() => deleteKozlemeny(params.row)}>Törlés</button>
+                        <button onClick={() => handleOpen(params)}>Szerkesztés</button>
                     </div>
                 )
             }
@@ -226,7 +229,7 @@ const Kozlemenyek = () => {
                         <button onClick={() => {
                             setPdfString(params.value);
                             setDocumentDialogOpen(true);
-                        }}>Open</button>
+                        }}>Publikáció megnyitása</button>
                     </div>
                 );
             }
@@ -236,12 +239,14 @@ const Kozlemenyek = () => {
     return (
         <div id='kozlemenyekMain'>
             <div id='ButtonsGroup'>
-                <button onClick={() => setAddDialogOpen(true)}>Add new</button>
-                <button onClick={() => setFilterByKiadoDialogOpen(true)}>Filter by Kiado</button>
-                <button onClick={() => setFilterByTipusDialogOpen(true)}>Filter by Tipus</button>
+                <button onClick={() => setAddDialogOpen(true)}>Új közlemény</button>
+                <button onClick={() => setFilterByKiadoDialogOpen(true)}>Szűrés kiadó szerint</button>
+                <button onClick={() => setFilterByTipusDialogOpen(true)}>Szűrés típus szerint</button>
             </div>
             <div>
-                <DataGrid rows={kozlemenyek} columns={columns}/>            
+                <ThemeProvider theme={theme}>
+                    <DataGrid rows={kozlemenyek} columns={columns}/>  
+                </ThemeProvider>          
             </div>
             <Dialog open={filterByKiadoDialogOpen} onClose={() => setFilterByKiadoDialogOpen(false)}>
                 <DialogContent>
@@ -255,8 +260,8 @@ const Kozlemenyek = () => {
                         renderInput={(params) => <TextField {...params} label='Kiadó' variant='standard'/>}
                         onChange={(event, value) => setSelectedKiadok(value)}
                     />
-                    <Button onClick={() => handleFilterByKiado()} sx={{ mt: 5}}>Filter</Button>
-                    <Button onClick={() => setFilterByKiadoDialogOpen(false)} sx={{ mt: 5}}>Cancel</Button>
+                    <Button onClick={() => handleFilterByKiado()} sx={{ mt: 5}}>Szűrés</Button>
+                    <Button onClick={() => setFilterByKiadoDialogOpen(false)} sx={{ mt: 5}}>Mégse</Button>
                 </DialogContent>
             </Dialog>
             <Dialog open={filterByTipusDialogOpen} onClose={() => setFilterByTipusDialogOpen(false)}>
@@ -270,12 +275,12 @@ const Kozlemenyek = () => {
                         renderInput={(params) => <TextField {...params} label='Típus' variant='standard'/>}
                         onChange={(event, value) => setSelectedTipus(value || '')}
                     />
-                    <Button onClick={() => handleFilterByTipus()} sx={{ mt: 5}}>Filter</Button>
-                    <Button onClick={() => setFilterByKiadoDialogOpen(false)} sx={{ mt: 5}}>Cancel</Button>
+                    <Button onClick={() => handleFilterByTipus()} sx={{ mt: 5}}>Szűrés</Button>
+                    <Button onClick={() => setFilterByTipusDialogOpen(false)} sx={{ mt: 5}}>Mégse</Button>
                 </DialogContent>
             </Dialog>
             <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>Közlemény hozzáadása</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
@@ -334,12 +339,12 @@ const Kozlemenyek = () => {
                     </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={() => handleAdd()}>Add</Button>
+                    <Button onClick={() => setAddDialogOpen(false)}>Mégse</Button>
+                    <Button onClick={() => handleAdd()}>Hozzáadás</Button>
                 </DialogActions>
             </Dialog>
             <Dialog open={updateDialogOpen} onClose={() => setUpdateDialogOpen(false)}>
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>Közlemény szerkesztése</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         ID: {selectedKozlemeny?.id}
@@ -400,8 +405,8 @@ const Kozlemenyek = () => {
                     </Select>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setUpdateDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={() => handleSave()}>Save</Button>
+                    <Button onClick={() => setUpdateDialogOpen(false)}>Mégse</Button>
+                    <Button onClick={() => handleSave()}>Mentés</Button>
                 </DialogActions>
             </Dialog>
             <h1 style={{textAlign: 'left', marginLeft: '5px'}}>Saját közlemények évenkénti statisztikája</h1>
@@ -433,7 +438,7 @@ const Kozlemenyek = () => {
             <Dialog open={documentDialogOpen} onClose={() => setDocumentDialogOpen(false)}>
                 <Document file={pdfString} onLoadSuccess={({ numPages }) => setNumPages(numPages)}>
                     {Array.apply(null, Array(numPages)).map((x, i) => i + 1).map((page) => (
-                        <Page width={1850} scale={0.3} pageNumber={page} />
+                        <Page width={1850} scale={0.3} pageNumber={page} renderTextLayer={false} renderAnnotationLayer={false}/>
                     
                     ))}
                 </Document>

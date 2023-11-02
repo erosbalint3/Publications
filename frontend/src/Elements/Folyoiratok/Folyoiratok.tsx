@@ -9,11 +9,12 @@ import './Folyoiratok.css';
 import { useEffect } from "react";
 import FolyoiratService from "../../Services/folyoiratService";
 import KiadoService from "../../Services/kiadoService";
-import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText, Alert, Stack } from "@mui/material";
+import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText, Alert, Stack, createTheme, ThemeProvider } from "@mui/material";
 import { ReactSession } from "react-client-session";
 import { Snackbar, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { Error } from '../../Models/Error';
+import { huHU } from "@mui/material/locale";
 
 const folyoiratService = new FolyoiratService();
 const kiadoService = new KiadoService();
@@ -39,17 +40,19 @@ const Folyoiratok = () => {
         return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
     });
 
+    const theme = createTheme({}, huHU);
+
     const columns: GridColDef[] = [
         {
             field: 'action', 
-            headerName: 'Action',
+            headerName: 'Funkciók',
             width: 200, 
             editable: false,
             renderCell: (params) => {
                 return (
                     <div>
-                        <button onClick={() => deleteFolyoirat(params.row)!}>Delete</button>
-                        <button onClick={() => handleOpen(params)} >Update </button>
+                        <button onClick={() => deleteFolyoirat(params.row)!}>Törlés</button>
+                        <button onClick={() => handleOpen(params)} >Szerkesztés</button>
                     </div>
                 )
             }
@@ -66,7 +69,7 @@ const Folyoiratok = () => {
         folyoiratService.getAllFolyoirat().then(setFolyoiratok);
         kiadoService.getAllKiado().then(setKiadok);
         if (startIndex == 0 && (!isLoggedIn)) {
-            alert('You are not logged in');
+            alert('Nem vagy bejelentkezve! Kérlek jelentkezz be!');
             window.location.href = '/login';
             startIndex++;
         }
@@ -74,12 +77,12 @@ const Folyoiratok = () => {
 
     const deleteFolyoirat = async (row: Folyoirat) => {
         if (!isLoggedIn || user.jogosultsag != "ADMIN") {
-            alert('You are not logged in or you are not an admin!');
+            alert('Nem vagy bejelentkezve vagy nem vagy adminisztrátor!');
             return;
         }
         const response = await folyoiratService.deleteFolyoirat(row);
         if ((response as unknown as Error)?.code == "ER_ROW_IS_REFERENCED_2") {
-            setSnackbarError('Cannot delete referenced row!');
+            setSnackbarError('Nem lehet törölni, másik tábla hivatkozik rá!');
             setSnackbarOpen(true);
         } else {
             window.location.reload();
@@ -88,7 +91,7 @@ const Folyoiratok = () => {
 
     const handleOpen = (params: any) => {
         if (!isLoggedIn || user.jogosultsag != "ADMIN") {
-            alert('You are not logged in or you are not an admin!');
+            alert('Nem vagy bejelentkezve vagy nem vagy adminisztrátor!');
             return;
         }
         setSelectedFolyoirat(params.row);
@@ -103,7 +106,7 @@ const Folyoiratok = () => {
 
     const handleAddDialogOpen = () => {
         if (!isLoggedIn || user.jogosultsag != "ADMIN") {
-            alert('You are not logged in or you are not an admin!');
+            alert('Nem vagy bejelentkezve vagy nem vagy adminisztrátor!');
             return;
         }
         setAddDialogOpen(true);
@@ -113,7 +116,7 @@ const Folyoiratok = () => {
         const response = folyoiratService.saveFolyoirat(selectedFolyoirat!);
         setUpdateDialogOpen(false);
         if ((response as unknown as Error)?.code == "ER_ROW_IS_REFERENCED_2") {
-            setSnackbarError('Cannot delete referenced row!');
+            setSnackbarError('Nem lehet szerkeszteni, másik tábla hivatkozik rá!');
             setSnackbarOpen(true);
         } else {
             window.location.reload();
@@ -128,10 +131,12 @@ const Folyoiratok = () => {
             </Alert>
         </Snackbar>
         <div id='ButtonsGroup'>
-            <button onClick={() => handleAddDialogOpen()}>Add new</button>
+            <button onClick={() => handleAddDialogOpen()}>Új Folyóirat</button>
         </div>
         <div>
-            <DataGrid rows={folyoiratok} columns={columns} editMode='row'/>
+            <ThemeProvider theme={theme}>
+                <DataGrid rows={folyoiratok} columns={columns} editMode='row'/>
+            </ThemeProvider>
         </div>
         <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
             <DialogTitle>Subscribe</DialogTitle>
@@ -187,8 +192,8 @@ const Folyoiratok = () => {
                 </Select>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
-                <Button onClick={() => handleAdd()}>Add</Button>
+                <Button onClick={() => setAddDialogOpen(false)}>Mégse</Button>
+                <Button onClick={() => handleAdd()}>Hozzáadás</Button>
             </DialogActions>
         </Dialog>
         <Dialog open={updateDialogOpen} onClose={() => setUpdateDialogOpen(false)}>
@@ -258,8 +263,8 @@ const Folyoiratok = () => {
                 </Select>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => setUpdateDialogOpen(false)}>Cancel</Button>
-                <Button onClick={() => handleSave()}>Save</Button>
+                <Button onClick={() => setUpdateDialogOpen(false)}>Mégse</Button>
+                <Button onClick={() => handleSave()}>Mentés</Button>
             </DialogActions>
         </Dialog>
     </div>;

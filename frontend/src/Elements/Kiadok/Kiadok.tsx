@@ -6,11 +6,12 @@ import { Kiado } from '../../Models/Kiado';
 import { v4 as uuidv4 } from 'uuid';
 import KiadoService from '../../Services/kiadoService';
 import './Kiadok.css';
-import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText } from "@mui/material";
+import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText, createTheme, ThemeProvider } from "@mui/material";
 import { ReactSession } from "react-client-session";
 import { Snackbar, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { Error } from '../../Models/Error';
+import { huHU } from '@mui/material/locale';
 
 const kiadoService = new KiadoService();
 
@@ -28,6 +29,8 @@ const Kiadok = () => {
 
     let startIndex = 0;
 
+    const theme = createTheme({}, huHU);
+
     const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
         props,
         ref,
@@ -44,8 +47,8 @@ const Kiadok = () => {
             renderCell: (params) => {
                 return (
                     <div>
-                        <button onClick={() => deleteKiado(params.row)!}>Delete</button>
-                        <button onClick={() => handleOpen(params)} >Update </button>
+                        <button onClick={() => deleteKiado(params.row)!}>Törlés</button>
+                        <button onClick={() => handleOpen(params)} >Szerkesztés</button>
                     </div>
                 )
             }
@@ -121,13 +124,15 @@ const Kiadok = () => {
                 </Alert>
             </Snackbar>
             <div id='ButtonsGroup'>
-                <button onClick={() => handleAddDialogOpen()}>Add new</button>
+                <button onClick={() => handleAddDialogOpen()}>Új kiadó</button>
             </div>
             <div>
-                <DataGrid rows={kiadok} columns={columns} editMode='row' getRowId={(row) => row.nev}/>
+                <ThemeProvider theme={theme}>
+                    <DataGrid rows={kiadok} columns={columns} editMode='row' getRowId={(row) => row.nev}/>
+                </ThemeProvider>
             </div>
             <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>Új kiadó</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
@@ -172,12 +177,12 @@ const Kiadok = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={() => handleAdd()}>Add</Button>
+                    <Button onClick={() => setAddDialogOpen(false)}>Mégse</Button>
+                    <Button onClick={() => handleAdd()}>Hozzáadás</Button>
                 </DialogActions>
             </Dialog>
             <Dialog open={updateDialogOpen} onClose={() => setUpdateDialogOpen(false)}>
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>Kiadó szerkesztése</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
@@ -221,8 +226,8 @@ const Kiadok = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setUpdateDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={() => handleSave()}>Save</Button>
+                    <Button onClick={() => setUpdateDialogOpen(false)}>Mégse</Button>
+                    <Button onClick={() => handleSave()}>Mentés</Button>
                 </DialogActions>
             </Dialog>
         </div>

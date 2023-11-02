@@ -78,20 +78,20 @@ const Profile = () => {
                 </Alert>
             </Snackbar>
             <div id="headerButtons">
-                <button onClick={() => setUpdateDialogOpen(true)}>Update profile</button>
-                <button onClick={() => deleteProfile(user)}>Delete profile</button>
+                <button onClick={() => setUpdateDialogOpen(true)}>Profil szerkesztése</button>
+                <button onClick={() => deleteProfile(user)}>Profil törlése</button>
             </div>
             <div id="profileInfo">
                 <div id="profilePicture">
                     <img src="https://i.imgur.com/YxABR43.jpeg" alt="Profile picture" />
                     <div id="profileText">
-                        <h1>Username</h1>
+                        <h1>Felhasználónév</h1>
                         <div>
-                            <p>First name: </p>
+                            <p>Vezetéknév: </p>
                             <input type="text" disabled value={firstName} />
                         </div>
                         <div>
-                            <p>Last name: </p>
+                            <p>Keresztnév: </p>
                             <input type="text" disabled value={lastName} />
                         </div>
                         <div>
@@ -102,7 +102,7 @@ const Profile = () => {
                 </div> 
             </div>
             <Dialog open={updateDialogOpen} onClose={() => setUpdateDialogOpen(false)}>
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>Profil szerkesztése</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
@@ -146,16 +146,16 @@ const Profile = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setUpdateDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={() => handleSave()}>Save</Button>
+                    <Button onClick={() => setUpdateDialogOpen(false)}>Mégse</Button>
+                    <Button onClick={() => handleSave()}>Mentés</Button>
                 </DialogActions>
             </Dialog>
             <div id="mainChangePasswordPart">
                 <div id="changePasswordButton">
-                    <button onClick={() => setUpdatePasswordDialogOpen(true)}>Change password</button>
+                    <button onClick={() => setUpdatePasswordDialogOpen(true)}>Jelszó módosítása</button>
                 </div>
                 <Dialog open={updatePasswordDialogOpen} onClose={() => setUpdatePasswordDialogOpen(false)}>
-                    <DialogTitle>Subscribe</DialogTitle>
+                    <DialogTitle>Jelszó módosítása</DialogTitle>
                     <DialogContent>
                         <TextField
                             autoFocus
@@ -198,8 +198,8 @@ const Profile = () => {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setUpdatePasswordDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={() => handleSave()}>Save</Button>
+                        <Button onClick={() => setUpdatePasswordDialogOpen(false)}>Mégse</Button>
+                        <Button onClick={() => handleSave()}>Mentés</Button>
                     </DialogActions>
                 </Dialog>
             </div>

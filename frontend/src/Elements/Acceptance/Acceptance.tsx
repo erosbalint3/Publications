@@ -4,6 +4,8 @@ import { GridRowsProp } from '@mui/x-data-grid';
 import { GridColDef } from '@mui/x-data-grid';
 import AcceptanceService from '../../Services/acceptanceService';
 import { Kozlemeny } from '../../Models/Kozlemeny';
+import { ThemeProvider, createTheme } from '@mui/material';
+import { huHU } from '@mui/material/locale';
 
 const acceptanceService = new AcceptanceService();
 
@@ -14,18 +16,20 @@ const Acceptance = () => {
         acceptanceService.getAllKozlemenyWaitingForAcceptance().then(data => setKozlemenyek(data));
     }, []);
 
+    const theme = createTheme({}, huHU);
+
     const columns: GridColDef[] = [
         {field: 'cim', headerName: 'Cím', width: 200, editable: false},
         {
             field: 'action', 
-            headerName: 'Action',
+            headerName: 'Funkciók',
             width: 200, 
             editable: false,
             renderCell: (params) => {
                 return (
                     <div>
-                        <button onClick={() => acceptanceService.acceptKozlemeny(params.id.toString())}>Accept</button>
-                        <button onClick={() => acceptanceService.rejectKozlemeny(params.id.toString())}>Reject</button>
+                        <button onClick={() => acceptanceService.acceptKozlemeny(params.id.toString())}>Elfogad</button>
+                        <button onClick={() => acceptanceService.rejectKozlemeny(params.id.toString())}>Elutasít</button>
                     </div>
                 )
             }
@@ -35,7 +39,9 @@ const Acceptance = () => {
     return (
         <div>
              <div>
-                <DataGrid rows={kozlemenyek} columns={columns} editMode='row' getRowId={(row) => row.id}/>
+                <ThemeProvider theme={theme}>
+                    <DataGrid rows={kozlemenyek} columns={columns} editMode='row' getRowId={(row) => row.id}/>
+                </ThemeProvider>
             </div>
         </div>
     );

@@ -53,7 +53,7 @@ const Register = () => {
                     Sikertelen regisztráció!
                 </Alert>
             </Snackbar>
-            <h1>Register</h1>
+            <h1>Regisztráció</h1>
             <div id='formDiv'>
                 <label htmlFor="Username">Felhasznalonév</label>
                 <input id='username' value={username} onChange={e => setUsername(e.target.value)} />
@@ -65,7 +65,7 @@ const Register = () => {
                 <input id='email' value={email} onChange={e => setEmail(e.target.value)} />
                 <label htmlFor="Password">Jelszó</label>
                 <input type='password' id='password' value={password} onChange={e => setPassword(e.target.value)} />
-                <button onClick={register}>Register</button>
+                <button onClick={register}>Regisztrálás</button>
             </div>
         </div>
     )

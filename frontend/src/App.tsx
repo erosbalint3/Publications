@@ -41,9 +41,9 @@ function App() {
               </Alert>
           </Snackbar>
           <nav id='navBar'>
-            <Link to="/">Profile</Link>
-            {!user && <Link to="/login">Login</Link>}
-            {!user && <Link to="/register">Register</Link>}
+            <Link to="/">Saját profil</Link>
+            {!user && <Link to="/login">Bejelentkezés</Link>}
+            {!user && <Link to="/register">Regisztráció</Link>}
             <Link to="/kozlemenyek">Közlemények</Link>   
             {user?.jogosultsag != 'SZERZO' && <Link to="/szerzok">Szerzők</Link>}    
             {user?.jogosultsag != 'SZERZO' && <Link to="/kiadok">Kiadók</Link>}
