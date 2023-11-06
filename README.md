@@ -1,27 +1,29 @@
-# Publications
+# Publikációk
 
-The project for the university class named Databases.
+Az egyetemi Adatbázisok tárgyhoz elkészített projekt.
 
-# Technical Details
+# Technológiai részletek
 
-The project is build on react, with typescript. The backend is built on nodejs/expressjs.
+A frontend react alatt készült.
+A backend nodejs-ben az express könyvtárral.
+Az adatbázis mysql.
 
-# Installation
+# Telepítés
 
-You need two separate terminals.
+Két külön terminál szükséges, az egyikben a frontend, a másikban a backend szerver fut.
 
 ## Backend
 
-The backend server runs on port 3001, make sure nothing uses it already on your system.
+A backend szerver a 3001-es porton van kiszolgálva.
 
 1. cd backend
-2. npm install
+2. npm install -f
 3. node app.js
 
 ## Frontend
 
-The frontend app runs on port 3000 by default.
+A frontend alapértelmezett portja a 3000.
 
 1. cd frontend
-2. npm install
+2. npm install -f
 3. npm start

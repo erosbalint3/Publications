@@ -88,12 +88,14 @@ app.get('/kozlemeny/felhasznalonev/', (req, res) => {
     });
 });
 app.post('/kozlemeny/', (req, res) => {
+    console.log(req.body);
     kozlemeny.addKozlemeny(req.body, (err, rows) => {
         if (err) res.send(err);
         res.send(rows); 
     });
 });
 app.put('/kozlemeny/', (req, res) => {
+    console.log(req.body);
     kozlemeny.updateKozlemeny(req.body, (err, rows) => {
         if (err) res.send(err);
         res.send(rows);

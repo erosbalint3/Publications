@@ -35,8 +35,9 @@ module.exports = {
     },
     updateKozlemeny: (kozlemeny, callback) => {
         connection.query('SET FOREIGN_KEY_CHECKS=0', (err, rows) => {
+            connection.query('DELETE FROM szerzoi WHERE kozl_id=?', [kozlemeny.id], (err, rows) => {});
             kozlemeny.szerzoi.forEach(element => {
-                connection.query('UPDATE szerzoi SET szerzo_id=? WHERE kozl_id=?', [element, kozlemeny.id], (err, rows) => {
+                connection.query('INSERT INTO szerzoi SET szerzo_id=?, kozl_id=?', [element, kozlemeny.id], (err, rows) => {
                     if (err) throw err;
                 }); 
             });
@@ -54,7 +55,7 @@ module.exports = {
     },
     addKozlemeny: (kozlemeny, callback) => {
         console.log(kozlemeny);
-        connection.query('INSERT INTO Kozlemeny SET id=?, cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=?, publikacioTipusa=?, publikacioFajlNev=?, publikacioFajlPath=?', [kozlemeny.id, kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev, kozlemeny.publikacioTipusa, kozlemeny.publikacioFajlNev, kozlemeny.publikacioFajlPath], (err, rows) => {
+        connection.query('INSERT INTO Kozlemeny SET id=?, cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=?, publikacioTipusa=?, publikacioFajlPath=?', [kozlemeny.id, kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev, kozlemeny.publikacioTipusa, kozlemeny.publikacioFajlPath], (err, rows) => {
             return callback(err, rows);
         });
         kozlemeny.szerzoi.forEach(element => {

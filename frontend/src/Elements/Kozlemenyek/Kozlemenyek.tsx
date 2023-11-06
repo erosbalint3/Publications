@@ -50,6 +50,7 @@ const Kozlemenyek = () => {
     const [documentDialogOpen, setDocumentDialogOpen] = useState(false);
     const [numPages, setNumPages] = useState(0);
     const [selectedTipus, setSelectedTipus] = useState<string>();
+    const [selectedSzerzok, setSelectedSzerzok] = useState<string[]>([]);
 
     const types = ['Journal', 'Magazine', 'Report', 'Book', 'Newspaper', 'Thesis', 'Bibliography', 'Other'];
 
@@ -65,6 +66,7 @@ const Kozlemenyek = () => {
     let startIndex = 0;
 
     const handleOpen = (params: any) => {
+        setSelectedSzerzok(params.row.szerzoi);
         setSelectedKozlemeny(params.row);
         setUpdateDialogOpen(true);
     };
@@ -78,7 +80,7 @@ const Kozlemenyek = () => {
     const handleSave = () => {
         kozlemenyService.saveKozlemeny(selectedKozlemeny!);
         setUpdateDialogOpen(false);
-        //window.location.reload();
+        window.location.reload();
     };
 
     useEffect(() => {
@@ -108,6 +110,18 @@ const Kozlemenyek = () => {
             startIndex++;
         }
     }, []);
+
+    const getSzerzoIdByName = (name: string[]) => {
+        let array: string[] = [];
+        name.forEach((szerzoName) => {
+            szerzok.forEach((szerzo) => {
+                if (szerzo.nev == szerzoName) {
+                    array.push(szerzo.id);
+                }
+            });
+        });
+        return array;
+    };
 
     const getFolyoiratNevById = (id: string) => {
         return folyoiratok.find((folyoirat) => folyoirat.id == id)?.nev;
@@ -393,16 +407,20 @@ const Kozlemenyek = () => {
                             setSelectedKozlemeny({ ...selectedKozlemeny, kiadas_eve: parseInt(event.target.value!) } as Kozlemeny);
                         }}
                     />
-                    <Select multiple value={selectedKozlemeny?.szerzoi} sx={{width: 200, color: "black"}} onChange={(event) => {
-                        setSelectedKozlemeny({ ...selectedKozlemeny, szerzoi: event.target.value as string[] } as Kozlemeny);
-                    }}>
-                        {szerzok.map((szerzo) => (
-                            <MenuItem 
-                                key={szerzo.nev}
-                                value={szerzo.id}
-                            >{szerzo.nev}</MenuItem>
-                        ))}
-                    </Select>
+                    <Autocomplete
+                        id='szerzoSelect'
+                        options={szerzok.map((szerzo) => szerzo.nev)}
+                        value={selectedSzerzok || []}
+                        multiple
+                        getOptionLabel={(option) => option}
+                        sx={{width: 300}}
+                        renderInput={(params) => <TextField {...params} label='Szerző' variant='standard'/>}
+                        onChange={(event, value) => {
+                                setSelectedKozlemeny({ ...selectedKozlemeny, szerzoi: getSzerzoIdByName(value) || []} as Kozlemeny);
+                                setSelectedSzerzok(value || []);
+                            }
+                        }
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setUpdateDialogOpen(false)}>Mégse</Button>
