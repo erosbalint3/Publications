@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { GridColDef } from '@mui/x-data-grid';
 import { Kozlemeny } from '../../Models/Kozlemeny';
@@ -51,6 +51,7 @@ const Kozlemenyek = () => {
     const [numPages, setNumPages] = useState(0);
     const [selectedTipus, setSelectedTipus] = useState<string>();
     const [selectedSzerzok, setSelectedSzerzok] = useState<string[]>([]);
+    const [selectedFilterTipusok, setSelectedFilterTipusok] = useState<string[]>([]);
 
     const types = ['Journal', 'Magazine', 'Report', 'Book', 'Newspaper', 'Thesis', 'Bibliography', 'Other'];
 
@@ -127,30 +128,17 @@ const Kozlemenyek = () => {
         return folyoiratok.find((folyoirat) => folyoirat.id == id)?.nev;
     }
 
-    function dynamicSort(property: keyof Kozlemeny) {
-        var sortOrder = 1;
-        if(property[0] === "-") {
-            sortOrder = -1;
-        }
-        return function (a: Kozlemeny,b: Kozlemeny) {
-            var result = (a[property]! < b[property]!) ? -1 : (a[property]! > b[property]!) ? 1 : 0;
-            return result * sortOrder;
-        }
-    }
-
     useEffect(() => {
         let array: number[] = [];
-        let usedUpEvek: number[] = [];
-        const sortedKozlemenyek = [...kozlemenyek].sort(dynamicSort('kiadas_eve'));
-        sortedKozlemenyek.forEach((kozlemeny) => {
-            let count = kozlemenyek.filter((kozl) => kozl.kiadas_eve == kozlemeny.kiadas_eve && kozl.felhasznalonev == user.felhasznalonev).length;
-            if (!usedUpEvek.includes(kozlemeny.kiadas_eve)) {
-                usedUpEvek.push(kozlemeny.kiadas_eve);
-                array.push(parseInt(count.toString()));
-            }
+        kozlemenyService.getKozlementDataForGraph(user.felhasznalonev, selectedFilterTipusok).then((resultKozlemenyek) => {
+            resultKozlemenyek.forEach((kozlemeny: any) => {
+                if ([...new Set(kozlemenyek.map((k: Kozlemeny) => k.kiadas_eve))].includes(kozlemeny.kiadas_eve )) {
+                    array.push(kozlemeny.db);
+                }
+            });
+            setKiadasEveGroup(array);
+            console.log(kiadasEveGroup);
         });
-        setKiadasEveGroup(array);
-
     }, [kozlemenyek]);
 
     useEffect(() => {
@@ -184,6 +172,8 @@ const Kozlemenyek = () => {
     const handleFilterByTipus = async () => {
         const tipusSelect = document.getElementById('tipusSelect') as HTMLSelectElement;
         const tipus = tipusSelect.value;
+        setSelectedFilterTipusok([]);
+        setSelectedFilterTipusok([ ...selectedFilterTipusok, tipus]);
         kozlemenyService.getKozlemenyByTipus(user.felhasznalonev, selectedTipus!).then((kozl: Kozlemeny[]) => {
             setKozlemenyek(kozl);
             kozlemenyek.map(async (kozlElement: Kozlemeny) => {
@@ -196,7 +186,6 @@ const Kozlemenyek = () => {
                 }
             });
         });
-        
         setFilterByTipusDialogOpen(false);
     };
 
@@ -433,7 +422,7 @@ const Kozlemenyek = () => {
                     xAxis={[
                         {
                             id: 'kiadasEvei',
-                            data: kozlemenyek.filter((value, index, self) => self.indexOf(value) === index).filter((kozlemeny) => kozlemeny.felhasznalonev == user?.felhasznalonev).map((kozlemeny) => kozlemeny.kiadas_eve),
+                            data: [...new Set(kozlemenyek.map((kozlemeny) => kozlemeny.kiadas_eve))].toSorted(),
                             scaleType: 'band',
                         }
                     ]}
@@ -446,7 +435,7 @@ const Kozlemenyek = () => {
                     ]}
                     series={[
                         {
-                            data: kiadasEveGroup
+                            data: kiadasEveGroup,
                         }
                     ]}
                     height={300}
@@ -457,7 +446,6 @@ const Kozlemenyek = () => {
                 <Document file={pdfString} onLoadSuccess={({ numPages }) => setNumPages(numPages)}>
                     {Array.apply(null, Array(numPages)).map((x, i) => i + 1).map((page) => (
                         <Page width={1850} scale={0.3} pageNumber={page} renderTextLayer={false} renderAnnotationLayer={false}/>
-                    
                     ))}
                 </Document>
             </Dialog>

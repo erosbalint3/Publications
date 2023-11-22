@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from '@mui/x-data-grid';
-import { GridRowsProp } from '@mui/x-data-grid';
 import { GridColDef } from '@mui/x-data-grid';
 import { Szerzo } from '../../Models/Szerzo';
 import { v4 as uuidv4 } from 'uuid';
 import SzerzoService from "../../Services/szerzoService";
 import './Szerzok.css';
-import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle, DialogContentText } from "@mui/material";
+import { Dialog, DialogContent, DialogActions, TextField, Select, Button, MenuItem, DialogTitle } from "@mui/material";
 import { ReactSession } from "react-client-session";
-import { Snackbar, ToggleButton, ToggleButtonGroup, createTheme, ThemeProvider } from '@mui/material';
+import { Snackbar, createTheme, ThemeProvider } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { Error } from '../../Models/Error';
 import { huHU } from '@mui/material/locale';
@@ -57,8 +56,8 @@ const Szerzok = () => {
             renderCell: (params) => {
                 return (
                     <div>
-                        <button onClick={() => deleteSzerzo(params.row)!}>Delete</button>
-                        <button onClick={() => handleOpen(params)} >Update </button>
+                        <button onClick={() => deleteSzerzo(params.row)!}>Törlés</button>
+                        <button onClick={() => handleOpen(params)} >Szerkesztés</button>
                     </div>
                 )
             }
@@ -104,7 +103,7 @@ const Szerzok = () => {
                 </Alert>
             </Snackbar>
             <div id='ButtonsGroup'>
-                <button onClick={() => setAddDialogOpen(true)}>Add new</button>
+                <button onClick={() => setAddDialogOpen(true)}>Új szerző hozzáadása</button>
             </div>
             <div>
                 <ThemeProvider theme={theme}>
@@ -112,7 +111,7 @@ const Szerzok = () => {
                 </ThemeProvider>
             </div>
             <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>Szerző hozzáadása</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
@@ -169,7 +168,7 @@ const Szerzok = () => {
                 </DialogActions>
             </Dialog>
             <Dialog open={updateDialogOpen} onClose={() => setUpdateDialogOpen(false)}>
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>Szerző szerkesztése</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus

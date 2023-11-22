@@ -54,7 +54,6 @@ module.exports = {
         });
     },
     addKozlemeny: (kozlemeny, callback) => {
-        console.log(kozlemeny);
         connection.query('INSERT INTO Kozlemeny SET id=?, cim=?, folyoirat_azon=?, kiadas_eve=?, felhasznalonev=?, publikacioTipusa=?, publikacioFajlPath=?', [kozlemeny.id, kozlemeny.cim, kozlemeny.folyoirat_azon, kozlemeny.kiadas_eve, kozlemeny.felhasznalonev, kozlemeny.publikacioTipusa, kozlemeny.publikacioFajlPath], (err, rows) => {
             return callback(err, rows);
         });
@@ -89,5 +88,16 @@ module.exports = {
         connection.query('SELECT * FROM Kozlemeny WHERE felhasznalonev=? AND publikacioTipusa=?', [felhasznalonev, tipus], (err, rows) => {
             return callback(err, rows);
         });
+    },
+    getKozlemenyStat(felhasznalonev, tipus, callback) {
+        if (tipus.length === 0) {
+            connection.query('SELECT kiadas_eve, COUNT(*) AS db FROM Kozlemeny WHERE felhasznalonev=? GROUP BY kiadas_eve', [felhasznalonev], (err, rows) => {
+                return callback(err, rows);
+            });
+        } else {
+            connection.query('SELECT kiadas_eve, COUNT(*) AS db FROM Kozlemeny WHERE publikacioTipusa IN (?) AND felhasznalonev=? GROUP BY kiadas_eve', [tipus, felhasznalonev], (err, rows) => {
+                return callback(err, rows);
+            });
+        }
     }
 };

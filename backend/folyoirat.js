@@ -47,5 +47,10 @@ module.exports = {
         connection.query('INSERT INTO Folyoirat SET ?', [folyoirat], (err, rows) => {
             return callback(err, rows);
         });
+    },
+    getFolyoiratWhereAverageReviewIsBiggerThanFive: (callback) => {
+        connection.query('SELECT * FROM Folyoirat WHERE kiado IN (SELECT kiado FROM Folyoirat GROUP BY kiado HAVING (SUM(minosites) / COUNT(minosites)) > 5)', (err, rows) => {
+            return callback(err, rows);
+        });
     }
 };

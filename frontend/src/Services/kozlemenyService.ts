@@ -59,6 +59,15 @@ class KozlemenyService {
         });
         return await response.json();
     }
+
+    async getKozlementDataForGraph(felhasznalonev: string, tipus: string[]) {
+        const headers = {"Content-Type": "application/json", "Allow-Origin-Access-Control": "*"};
+        const response = await fetch(`http://localhost:3001/kozlemeny/stat/?adatok=${encodeURIComponent(JSON.stringify({'felhasznalonev': felhasznalonev, 'tipus': tipus}))}`, {
+            method: 'GET',
+            headers: headers
+        });
+        return await response.json();
+    }
 }
 
 export default KozlemenyService;

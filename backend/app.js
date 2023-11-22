@@ -29,7 +29,6 @@ app.get('/user/', async (req, res) => {
 });
 app.post('/user/', (req, res) => {
     req.query.user = JSON.parse(req.query.user);
-    console.log(req.query.user);
     user.registerUser(req.query.user, (err, rows) => {
         if (err) res.send(err);
         res.send(rows);
@@ -69,6 +68,14 @@ app.get('/kozlemeny/', (req, res) => {
         res.send(rows);
     });
 });
+app.get('/kozlemeny/stat/', (req, res) => {
+    req.query.adatok = JSON.parse(req.query.adatok);
+    console.log(req.query.adatok);
+    kozlemeny.getKozlemenyStat(req.query.adatok.felhasznalonev, req.query.adatok.tipus, (err, rows) => {
+        if (err) res.send(err);
+        res.send(rows);
+    });
+});
 app.get('/kozlemeny/folyoirat/', (req, res) => {
     kozlemeny.getKozlemenyByFolyoirat(req.query.folyoirat_azon, (err, rows) => {
         if (err) res.send(err);
@@ -88,14 +95,12 @@ app.get('/kozlemeny/felhasznalonev/', (req, res) => {
     });
 });
 app.post('/kozlemeny/', (req, res) => {
-    console.log(req.body);
     kozlemeny.addKozlemeny(req.body, (err, rows) => {
         if (err) res.send(err);
         res.send(rows); 
     });
 });
 app.put('/kozlemeny/', (req, res) => {
-    console.log(req.body);
     kozlemeny.updateKozlemeny(req.body, (err, rows) => {
         if (err) res.send(err);
         res.send(rows);
@@ -149,6 +154,12 @@ app.delete('/kiado/', (req, res) => {
 
 app.get('/folyoirat', (req, res) => {
     folyoirat.getAllFolyoirat((err, rows) => {
+        if (err) res.send(err);
+        res.send(rows);
+    });
+});
+app.get('/folyoirat/average/', (req, res) => {
+    folyoirat.getFolyoiratWhereAverageReviewIsBiggerThanFive((err, rows) => {
         if (err) res.send(err);
         res.send(rows);
     });
@@ -273,7 +284,6 @@ app.get('/user/all', (req, res) => {
     });
 });
 
-
 app.listen(port, () => {
     console.log(`this app runs in port: ${port}`);
-})
+});

@@ -45,6 +45,15 @@ class FolyoiratService {
         });
         return await response.json();
     }
+
+    async getFolyoiratByBigAverage() {
+        const headers = {"Content-Type": "application/json", "Allow-Origin-Access-Control": "*"};
+        const response = await fetch(`http://localhost:3001/folyoirat/average`, {
+            method: 'GET',
+            headers: headers
+        });
+        return await response.json();
+    }
 }
 
 export default FolyoiratService;

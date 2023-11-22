@@ -123,6 +123,11 @@ const Folyoiratok = () => {
         }
         window.location.reload();
     };
+
+    const handleFilterByBigAverage = async () => {
+        const response = await folyoiratService.getFolyoiratByBigAverage() as unknown as Folyoirat[];
+        setFolyoiratok(response);
+    };
     
     return <div id="folyoiratokMain">
         <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}>
@@ -132,6 +137,7 @@ const Folyoiratok = () => {
         </Snackbar>
         <div id='ButtonsGroup'>
             <button onClick={() => handleAddDialogOpen()}>Új Folyóirat</button>
+            <button onClick={() => handleFilterByBigAverage()}>Nagyobb átlag minősítésű folyóiratok kiadónként átlagolva</button>
         </div>
         <div>
             <ThemeProvider theme={theme}>
@@ -139,7 +145,7 @@ const Folyoiratok = () => {
             </ThemeProvider>
         </div>
         <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
-            <DialogTitle>Subscribe</DialogTitle>
+            <DialogTitle>Folyóirat hozzáadása</DialogTitle>
             <DialogContent>
                 <TextField
                     autoFocus
@@ -197,7 +203,7 @@ const Folyoiratok = () => {
             </DialogActions>
         </Dialog>
         <Dialog open={updateDialogOpen} onClose={() => setUpdateDialogOpen(false)}>
-            <DialogTitle>Subscribe</DialogTitle>
+            <DialogTitle>Folyóirat szerkesztése</DialogTitle>
             <DialogContent>
                 <TextField
                     autoFocus
@@ -253,7 +259,7 @@ const Folyoiratok = () => {
                         setSelectedFolyoirat({ ...selectedFolyoirat, minosites: parseInt(event.target.value!) } as Folyoirat);
                     }}
                 />
-                <Select value={selectedFolyoirat?.kiado} sx={{width: 200, color: "black"}} onChange={(params) => setAddData({ ...addData, kiado: params.target.value})}>
+                <Select value={selectedFolyoirat?.kiado} sx={{width: 200, color: "black"}} onChange={(params) => setSelectedFolyoirat({ ...selectedFolyoirat, kiado: params.target.value } as Folyoirat)}>
                     {kiadok.map((kiado) => (
                         <MenuItem 
                             key={kiado.nev}
